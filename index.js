@@ -15,7 +15,7 @@ const PLAID_ENV = process.env.PLAID_ENV || 'sandbox';
 
 const influxClient = new Influx.InfluxDB({
   database: 'momerlin',
-  host: process.env.HOST,
+  host: 'localhost',
   port: 8086,
   username: process.env.UNAME,
   password: process.env.PASSWORD,
@@ -236,9 +236,9 @@ app.get('/api/transactions', async function (request, response, next) {
     const total_transactions = result.data.total_transactions;
 
     // Manipulate the offset parameter to paginate
-    
+
     // transactions and retrieve all available data
-    
+
     while (transactions.length < total_transactions) {
       const paginatedRequest = {
         access_token: ACCESS_TOKEN,
@@ -249,22 +249,20 @@ app.get('/api/transactions', async function (request, response, next) {
         },
       };
       paginatedResponse = await client.transactionsGet(paginatedRequest);
-
-      console.log("checking paginatedResponse...",paginatedResponse);
       transactions = transactions.concat(
         paginatedResponse.data.transactions,
       );
     }
 
-// Preparing rows to insert into influxDB
+    // Preparing rows to insert into influxDB
 
     const rows = transactions.map((t) => {
       return {
         measurement: 'transactions',
         tags: {
           name: t.name,
-          amount: t.amount, 
-          iso_currency_code : t.iso_currency_code,
+          amount: t.amount,
+          iso_currency_code: t.iso_currency_code,
           sats: ''
         },
         fields: {
@@ -275,19 +273,19 @@ app.get('/api/transactions', async function (request, response, next) {
     });
 
     // Inserting into influxDB
-    
+
     await influxClient.writePoints(rows)
-    .catch(err => {
-      console.error(`Error saving data to InfluxDB! ${err.stack}`)
-    });
+      .catch(err => {
+        console.error(`Error saving data to InfluxDB! ${err.stack}`)
+      });
     response.json(result.data);
     return console.log('Data stored successfully!');
 
-  } 
+  }
 
-   catch (error) {
+  catch (error) {
     // prettyPrintResponse(error.response);
-    console.log("error....",error.message);
+    console.log("Get transaction error....", error.message);
     return response.json(formatError(error));
   }
 });
