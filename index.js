@@ -99,7 +99,7 @@ app.post('/api/create_link_token', async function (request, response) {
       // This should correspond to a unique id for the current user.
       client_user_id: 'user-id',
     },
-    client_name: 'Plaid Quickstart',
+    client_name: 'Momerlin',
     products: PLAID_PRODUCTS,
     country_codes: PLAID_COUNTRY_CODES,
     language: 'en',
@@ -222,7 +222,7 @@ app.get('/api/auth', async function (request, response, next) {
 // https://plaid.com/docs/#transactions
 app.get('/api/transactions', async function (request, response, next) {
   // Pull transactions for the Item for the last 30 days
-  const startDate = moment().subtract(30, 'days').format('YYYY-MM-DD');
+  const startDate = moment().subtract(90, 'days').format('YYYY-MM-DD');
   const endDate = moment().format('YYYY-MM-DD');
   const configs = {
     access_token: ACCESS_TOKEN,
@@ -256,30 +256,40 @@ app.get('/api/transactions', async function (request, response, next) {
 
     // Preparing rows to insert into influxDB
 
-    const rows = transactions.map((t) => {
-      return {
-        measurement: 'transactions',
-        tags: {
-          name: t.name,
-          amount: t.amount,
-          iso_currency_code: t.iso_currency_code,
-          sats: ''
-        },
-        fields: {
-          merchand_name: t.merchant_name
-        },
-        timestamp: moment(t.date).unix(),
+    let rows = []
+    transactions.map((t) => {
+      let sat = Math.ceil(t.amount) - t.amount
+      if (t.merchant_name !== null) {
+        let time = moment(t.date).utc().valueOf()
+        rows.push({
+          measurement: 'transactions',
+          tags: {
+            name: t.name.replace(/[^a-zA-Z- ]/g, ""),
+            amount: t.amount,
+            iso_currency_code: t.iso_currency_code,
+            sats: sat,
+            createdAt:moment(t.date).utc().valueOf()
+          },
+          fields: {
+            merchant_name: t.merchant_name.replace(/[^a-zA-Z- ]/g, "")
+          },
+          timestamp: time,
+        })
       }
     });
 
     // Inserting into influxDB
-
-    await influxClient.writePoints(rows)
-      .catch(err => {
-        console.error(`Error saving data to InfluxDB! ${err.stack}`)
-      });
+    try {
+      await influxClient.writePoints(rows)
+        .catch(err => {
+          console.error(`Error saving data to InfluxDB! ${err.stack}`)
+        });
+    } catch (error) {
+      console.log("Checking db error....",error.message);
+    }
+   
     response.json(result.data);
-    return console.log('Data stored successfully!');
+    // return console.log('Data stored successfully!');
 
   }
 
@@ -290,7 +300,24 @@ app.get('/api/transactions', async function (request, response, next) {
   }
 });
 
+// Retrieve Transactions from influxDB
+
+app.get( '/api/momerlin/transactions',
+async function(request,response,next){
+  try {
+    const results = await influxClient.query(`
+    select * from transactions
+    limit 10
+  `);
+  
+    return response.json(results)
+  } catch (err) {
+    console.log(`Error while processing ${err}`);
+  }
+})
+
 // Retrieve Investment Transactions for an Item
+
 // https://plaid.com/docs/#investments
 app.get(
   '/api/investment_transactions',
