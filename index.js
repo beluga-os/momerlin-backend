@@ -253,14 +253,18 @@ app.get('/api/transactions', async function (request, response, next) {
         paginatedResponse.data.transactions,
       );
     }
-
+    let recent
+    try {
+      recent = await influxClient.query(`select * from transactions order by time desc limit 1`)
+    } catch (error) {
+     console.log("Error while retrieving from db..",error); 
+    }
     // Preparing rows to insert into influxDB
-
     let rows = []
     transactions.map((t) => {
       let sat = Math.ceil(t.amount) - t.amount
-      if (t.merchant_name !== null) {
         let time = moment(t.date).utc().valueOf()
+      if (t.merchant_name !== null && time > parseInt(recent[0].createdAt)) {
         rows.push({
           measurement: 'transactions',
           tags: {
@@ -304,10 +308,10 @@ app.get('/api/transactions', async function (request, response, next) {
 
 app.get( '/api/momerlin/transactions',
 async function(request,response,next){
+  let limit = request.query.limit || 10
   try {
     const results = await influxClient.query(`
-    select * from transactions
-    limit 10
+    select * from transactions order by time desc limit ${limit}
   `);
   
     return response.json(results)
