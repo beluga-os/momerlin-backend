@@ -222,6 +222,7 @@ app.get('/api/auth', async function (request, response, next) {
 // https://plaid.com/docs/#transactions
 app.get('/api/transactions', async function (request, response, next) {
   // Pull transactions for the Item for the last 30 days
+  const address = request.query.address
   const startDate = moment().subtract(90, 'days').format('YYYY-MM-DD');
   const endDate = moment().format('YYYY-MM-DD');
   const configs = {
@@ -264,21 +265,38 @@ app.get('/api/transactions', async function (request, response, next) {
     transactions.map((t) => {
       let sat = Math.ceil(t.amount) - t.amount
         let time = moment(t.date).utc().valueOf()
-      if (t.merchant_name !== null && time > parseInt(recent[0].createdAt)) {
-        rows.push({
+      if (t.merchant_name !== null) {
+        recent.length < 0 ? rows.push({
           measurement: 'transactions',
           tags: {
             name: t.name.replace(/[^a-zA-Z- ]/g, ""),
             amount: t.amount,
+            address: address,
             iso_currency_code: t.iso_currency_code,
             sats: sat,
-            createdAt:moment(t.date).utc().valueOf()
+            createdAt: moment(t.date).utc().valueOf()
           },
           fields: {
             merchant_name: t.merchant_name.replace(/[^a-zA-Z- ]/g, "")
           },
           timestamp: time,
-        })
+        }) :
+          (recent.length > 0 && time > parseInt(recent[0].createdAt)) &&
+          rows.push({
+            measurement: 'transactions',
+            tags: {
+              name: t.name.replace(/[^a-zA-Z- ]/g, ""),
+              amount: t.amount,
+              address: address,
+              iso_currency_code: t.iso_currency_code,
+              sats: sat,
+              createdAt: moment(t.date).utc().valueOf()
+            },
+            fields: {
+              merchant_name: t.merchant_name.replace(/[^a-zA-Z- ]/g, "")
+            },
+            timestamp: time,
+          })
       }
     });
 
@@ -308,10 +326,13 @@ app.get('/api/transactions', async function (request, response, next) {
 
 app.get( '/api/momerlin/transactions',
 async function(request,response,next){
+  
+  let address = request.query.address 
+  
   let limit = request.query.limit || 10
   try {
     const results = await influxClient.query(`
-    select * from transactions order by time desc limit ${limit}
+    select * from transactions where address === ${address} order by time desc limit ${limit}
   `);
   
     return response.json(results)
