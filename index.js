@@ -266,7 +266,7 @@ app.get('/api/transactions', async function (request, response, next) {
       let sat = Math.ceil(t.amount) - t.amount
         let time = moment(t.date).utc().valueOf()
       if (t.merchant_name !== null) {
-        recent.length < 0 ? rows.push({
+        recent.length < 1 ? rows.push({
           measurement: 'transactions',
           tags: {
             name: t.name.replace(/[^a-zA-Z- ]/g, ""),
