@@ -332,7 +332,7 @@ async function(request,response,next){
   let limit = request.query.limit || 10
   try {
     const results = await influxClient.query(`
-    select * from transactions where address === ${address} order by time desc limit ${limit}
+    select * from transactions where address = ${address} order by time desc limit ${limit}
   `);
   
     return response.json(results)
