@@ -85,9 +85,12 @@ const options = {
 			description: "A simple Express Library API",
 		},
 		servers: [
+      {
+        url:"http://52.66.200.27:8000"
+      },
 			{
 				url: "http://localhost:8000",
-			},
+			}
 		],
 	},
 	apis: ["*.js"],
@@ -499,7 +502,6 @@ app.get( '/api/momerlin/transactions',
 async function(request,response,next){
   
   let address = request.query.address 
-  
   let limit = request.query.limit || 10
   try {
     const results = await influxClient.query(`
