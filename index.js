@@ -224,6 +224,10 @@ app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
  *               type: array
  * /api/momerlin/transactions:
  *   get:
+ *     parameters:
+ *       - in: query
+ *         name: address
+ *         required: true
  *     summary: Returns the list of all the transactions
  *     tags: [Transactions]
  *     responses:
@@ -499,7 +503,7 @@ async function(request,response,next){
   let limit = request.query.limit || 10
   try {
     const results = await influxClient.query(`
-    select * from transactions order by time desc limit ${limit}
+    select * from transactions where address = ${address} order by time desc limit ${limit}
   `);
   
     return response.json(results)
