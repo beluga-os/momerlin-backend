@@ -7,6 +7,9 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const moment = require('moment');
 
+const swaggerUI = require("swagger-ui-express");
+const swaggerJsDoc = require("swagger-jsdoc");
+
 const Influx = require('influx');
 const APP_PORT = process.env.APP_PORT || 8000;
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
@@ -73,6 +76,25 @@ const configuration = new Configuration({
 
 const client = new PlaidApi(configuration);
 
+const options = {
+	definition: {
+		openapi: "3.0.0",
+		info: {
+			title: "Library API",
+			version: "1.0.0",
+			description: "A simple Express Library API",
+		},
+		servers: [
+			{
+				url: "http://localhost:8000",
+			},
+		],
+	},
+	apis: ["*.js"],
+};
+
+const specs = swaggerJsDoc(options);
+
 const app = express();
 app.use(
   bodyParser.urlencoded({
@@ -82,6 +104,151 @@ app.use(
 app.use(bodyParser.json());
 
 app.use(cors());
+
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Transactions:
+ *       type: object
+ *       required:
+ *         - address
+ *         - sats
+ *       properties:
+ *         address:
+ *           type: string
+ *           description: Address of wallet
+ *         time:
+ *           type: number
+ *           description: Time of transaction
+ *         createdAt:
+ *           type: number
+ *           description: Transaction created time
+ *         iso_currency_code:
+ *           type: string
+ *           description: Code of ISO currency
+ *         merchand_name:
+ *           type: string
+ *           description: Merchand name
+ *         name:
+ *           type: string
+ *           description: Name of company
+ *         amount:
+ *           type: number
+ *           description: Transaction amount
+ *         sats:
+ *           type: number
+ *           description: Sats awarded
+ *       example:
+ *         address: 0xadoijnm654fvdf54986df5b98d6f5b9d5fb
+ *         time: 5214789630
+ *         createdAt: 5214789630
+ *         iso_currency_code: USD
+ *         merchand_name: Tata
+ *         name: Tata
+ *         amount: 520.60
+ *         sats: 40
+ *     
+ *     Token:
+ *       type: object
+ *       required:
+ *         - public_token
+ *       properties:
+ *         public_token:
+ *           type: string
+ *           description: Public token
+ *       example:
+ *         public_token: publictoken
+ */
+
+ /**
+  * @swagger
+  * tags:
+  *   name: Transactions
+  *   description: Transactions details managment api
+  */
+
+ /**
+ * @swagger
+ * /api/info:
+ *   post:
+ *     summary: Returns plaid link info
+ *     tags: [Transactions]
+ *     responses:
+ *       200:
+ *         description: plaid Link information
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ * /api/create_link_token:
+ *   post:
+ *     summary: Returns plaid link token
+ *     tags: [Transactions]
+ *     responses:
+ *       200:
+ *         description: Plaid link token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ * /api/create_link_token_for_payment:
+ *   post:
+ *     summary: Returns plaid link token for payment
+ *     tags: [Transactions]
+ *     responses:
+ *       200:
+ *         description: Plaid link token for payment
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ * /api/set_access_token:
+ *   post:
+ *     summary: Sets plaid link access token
+ *     tags: [Transactions]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Token'
+ *     responses:
+ *       200:
+ *         description: Access token set
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ * /api/momerlin/transactions:
+ *   get:
+ *     summary: Returns the list of all the transactions
+ *     tags: [Transactions]
+ *     responses:
+ *       200:
+ *         description: The list of the transactions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Transactions'
+ * /api/transactions:
+ *   get:
+ *     summary: Returns the list of all the transactions
+ *     tags: [Transactions]
+ *     responses:
+ *       200:
+ *         description: The list of the transactions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Transactions'
+ */
 
 app.post('/api/info', function (request, response, next) {
   response.json({
@@ -332,7 +499,7 @@ async function(request,response,next){
   let limit = request.query.limit || 10
   try {
     const results = await influxClient.query(`
-    select * from transactions where address === ${address} order by time desc limit ${limit}
+    select * from transactions order by time desc limit ${limit}
   `);
   
     return response.json(results)
