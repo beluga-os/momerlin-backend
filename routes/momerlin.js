@@ -249,7 +249,7 @@ router.get('/', (req, res) => {
 
   /**
  * @swagger
- * /user/create:
+ * /user:
  *   post:
  *     summary: Creates new user
  *     tags: [Users]
@@ -279,7 +279,7 @@ router.get('/', (req, res) => {
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Users'
- * /user:
+ * /user/get:
  *   get:
  *     parameters:
  *       - in: query
@@ -488,11 +488,11 @@ router.get('/payment',PlaidController.getPayment) // Get payments list
 
 // ******* Users Api's ************ //
 
-router.post('/user/create',PlaidController.createUser) // Create user
+router.post('/user',PlaidController.createUser) // Create user
 
 router.get('/users',PlaidController.createLinkToken) // Get users
 
-router.get('/user',PlaidController.getUser) // Get a particular user
+router.get('/user/get',PlaidController.getUser) // Get a particular user
 
 router.put('/user/update',PlaidController.updateUser) // Api to update a user
 
