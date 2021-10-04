@@ -4,7 +4,7 @@
   "description": "Momerlin backend",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node app.js",
     "watch": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,14 +12,21 @@
   "repository": "https://github.com/Mo-Merlin/momerlin-backend",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "body-parser": "1.18.x",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "ejs": "2.5.x",
     "express": "4.16.x",
     "influx": "^5.9.2",
+    "jsonwebtoken": "^8.5.1",
     "moment": "2.22.x",
+    "mongoose": "^6.0.8",
+    "mongoose-paginate-v2": "^1.4.2",
+    "mongoose-validator": "^2.1.0",
     "nodemon": "^2.0.5",
+    "parse-error": "^0.2.0",
+    "passport-jwt": "^4.0.0",
     "plaid": "^9.0.0-beta.11",
     "swagger-jsdoc": "^6.1.0",
     "swagger-ui-express": "^4.1.6"

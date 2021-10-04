@@ -10,11 +10,12 @@ const moment = require('moment');
 const swaggerUI = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
 
+const { v4: uuidv4 } = require('uuid');
 const Influx = require('influx');
 const APP_PORT = process.env.APP_PORT || 8000;
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
 const PLAID_SECRET = process.env.PLAID_SECRET;
-const PLAID_ENV = process.env.PLAID_ENV || 'sandbox';
+const PLAID_ENV = process.env.PLAID_ENV || 'development';
 
 const influxClient = new Influx.InfluxDB({
   database: 'momerlin',
@@ -23,6 +24,7 @@ const influxClient = new Influx.InfluxDB({
   username: process.env.UNAME,
   password: process.env.PASSWORD,
 });
+
 
 // PLAID_PRODUCTS is a comma-separated list of products to use when initializing
 // Link. Note that this list must contain 'assets' in order for the app to be
@@ -485,7 +487,6 @@ app.get('/api/transactions', async function (request, response, next) {
     }
    
     response.json(result.data);
-    // return console.log('Data stored successfully!');
 
   }
 
@@ -497,6 +498,62 @@ app.get('/api/transactions', async function (request, response, next) {
 });
 
 // Retrieve Transactions from influxDB
+
+app.get( '/api/users',
+async function(request,response,next){
+  
+  let limit = request.query.limit || 10
+  try {
+    const results = await influxClient.query(`
+    select * from users order by time desc limit ${limit}
+  `);
+  
+    return response.json(results)
+  } catch (err) {
+    console.log(`Error while processing ${err}`);
+  }
+})
+
+// Create user
+
+app.post( '/api/user',
+async function(request,response,next){
+  
+  let body = request.body 
+  let rows = [{
+    measurement: 'users',
+    tags: {
+      id: uuidv4(),
+      fullName: body.fullName ? body.fullName : "Momerlin",
+      btcAddress: body.btcAddress ? body.btcAddress :"",
+      ethAddress: body.ethAddress ? body.ethAddress :"",
+      tronAddress: body.tronAddress ? body.tronAddress :"",
+      seedEncrptd: body.seedEncrptd ? body.btcAddress :""
+    },
+    fields: {
+      password: body.password ? body.password :"",
+      imageUrl: body.imageUrl ? body.imageUrl : ""
+    },
+    timestamp: moment().utc().valueOf(),
+  }]
+
+    // Inserting into influxDB
+    try {
+      await influxClient.writePoints(rows).then(data=>{
+        return response.json({message:"User created successfully..",success:true,User:data})
+      })
+        .catch(err => {
+          console.error(`Error saving data to InfluxDB! ${err.stack}`)
+        });
+
+    } catch (error) {
+      console.log("Checking db error....",error.message);
+    }
+   
+    // response.json({message:"User created successfully..",success:true});
+})
+
+// Retrieve Users
 
 app.get( '/api/momerlin/transactions',
 async function(request,response,next){
@@ -515,6 +572,48 @@ async function(request,response,next){
 })
 
 // Retrieve Investment Transactions for an Item
+
+
+// Create challange
+
+app.post( '/api/challenge',
+async function(request,response,next){
+  
+  let body = request.body 
+  let rows = [{
+    measurement: 'challenges',
+    tags: {
+      id: uuidv4(),
+      mode: body.mode ? body.mode :"",
+      type: body.type ? body.type :"",
+      totalCompetitors: body.totalCompetitors ? body.totalCompetitors :"",
+      streakDays: body.streakDays ? body.streakDays :"",
+      totalKm: body.totalKm ? body.totalKm :"",
+      createdBy: body.createdBy ? body.createdBy :"",
+      competitors: body.competitors ? body.competitors :[],
+      startAt: body.startAt ? body.startAt :"",
+      endAt: body.endAt ? body.endAt :"",
+      createdAt: moment().utc().valueOf(),
+      active:false
+    },
+    fields: {
+      wage: body.wage ? body.wage :""
+    },
+    timestamp: moment().utc().valueOf(),
+  }]
+
+    // Inserting into influxDB
+    try {
+      await influxClient.writePoints(rows)
+        .catch(err => {
+          console.error(`Error in creating challenge! ${err.stack}`)
+        });
+    } catch (error) {
+      console.log("Checking db error....",error.message);
+    }
+   
+    response.json(result.data);
+})
 
 // https://plaid.com/docs/#investments
 app.get(
