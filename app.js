@@ -33,10 +33,10 @@ const options = {
 		},
 		servers: [
       {
-        url:"http://52.66.200.27:8000"
+        url:"http://52.66.200.27:3007/app"
       },
 			{
-				url: "http://localhost:8000",
+				url: "http://localhost:3007/app",
 			}
 		],
 	},

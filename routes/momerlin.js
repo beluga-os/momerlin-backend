@@ -157,7 +157,7 @@ router.get('/', (req, res) => {
 
  /**
  * @swagger
- * /api/info:
+ * /info:
  *   post:
  *     summary: Returns plaid link info
  *     tags: [Transactions]
@@ -168,7 +168,7 @@ router.get('/', (req, res) => {
  *           application/json:
  *             schema:
  *               type: array
- * /api/create_link_token:
+ * /create_link_token:
  *   post:
  *     summary: Returns plaid link token
  *     tags: [Transactions]
@@ -179,7 +179,7 @@ router.get('/', (req, res) => {
  *           application/json:
  *             schema:
  *               type: array
- * /api/create_link_token_for_payment:
+ * /create_link_token_for_payment:
  *   post:
  *     summary: Returns plaid link token for payment
  *     tags: [Transactions]
@@ -190,7 +190,7 @@ router.get('/', (req, res) => {
  *           application/json:
  *             schema:
  *               type: array
- * /api/set_access_token:
+ * /set_access_token:
  *   post:
  *     summary: Sets plaid link access token
  *     tags: [Transactions]
@@ -207,7 +207,7 @@ router.get('/', (req, res) => {
  *           application/json:
  *             schema:
  *               type: array
- * /api/momerlin/transactions:
+ * /momerlin/transactions:
  *   get:
  *     parameters:
  *       - in: query
@@ -224,7 +224,7 @@ router.get('/', (req, res) => {
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Transactions'
- * /api/transactions:
+ * /transactions:
  *   get:
  *     summary: Returns the list of all the transactions
  *     tags: [Transactions]
@@ -249,7 +249,7 @@ router.get('/', (req, res) => {
 
   /**
  * @swagger
- * /api/user:
+ * /user:
  *   post:
  *     summary: Creates new user
  *     tags: [Users]
@@ -266,7 +266,7 @@ router.get('/', (req, res) => {
  *           application/json:
  *             schema:
  *               type: array
- * /api/users:
+ * /users:
  *   get:
  *     summary: Returns the list of all the users
  *     tags: [Users]
@@ -290,7 +290,7 @@ router.get('/', (req, res) => {
 
   /**
  * @swagger
- * /api/challenge:
+ * /challenge:
  *   post:
  *     summary: Creates new challenge
  *     tags: [Challenges]
@@ -307,7 +307,7 @@ router.get('/', (req, res) => {
  *           application/json:
  *             schema:
  *               type: array
- * /api/challenges:
+ * /challenges:
  *   get:
  *     summary: Returns the list of all the challenges
  *     tags: [Challenges]
