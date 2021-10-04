@@ -249,7 +249,7 @@ router.get('/', (req, res) => {
 
   /**
  * @swagger
- * /user:
+ * /user/create:
  *   post:
  *     summary: Creates new user
  *     tags: [Users]
@@ -279,6 +279,63 @@ router.get('/', (req, res) => {
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Users'
+ * /user:
+ *   get:
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         required: true
+ *     summary: Returns a particular user
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: user information is
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Users'
+ * /user/update:
+ *   put:
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         required: true
+ *     summary: Updates a users
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Users'
+ *     responses:
+ *       200:
+ *         description: user updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Users'
+ * /user/delete:
+ *   delete:
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         required: true
+ *     summary: Delete the user
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: user deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Users'
  */
 
 /**
@@ -290,7 +347,7 @@ router.get('/', (req, res) => {
 
   /**
  * @swagger
- * /challenge:
+ * /challenge/create:
  *   post:
  *     summary: Creates new challenge
  *     tags: [Challenges]
@@ -320,6 +377,80 @@ router.get('/', (req, res) => {
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Challenges'
+ * /challenge:
+ *   get:
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         required: true
+ *     summary: Returns a particular challenge
+ *     tags: [Challenges]
+ *     responses:
+ *       200:
+ *         description: Challenge information is
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Challenges'
+ * /challenge/update:
+ *   put:
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         required: true
+ *     summary: Updates a challenges
+ *     tags: [Challenges]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Challenges'
+ *     responses:
+ *       200:
+ *         description: Challenge updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Challenges'
+ * /challenge/join:
+ *   put:
+ *     parameters:
+ *       - in: query
+ *         name: id,challenge
+ *         required: true
+ *     summary: Api to join a challenge
+ *     tags: [Challenges]
+ *     responses:
+ *       200:
+ *         description: Successfully joined in this challenge
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Challenges'
+ * /challenge/delete:
+ *   delete:
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         required: true
+ *     summary: Delete the challenge
+ *     tags: [Challenges]
+ *     responses:
+ *       200:
+ *         description: Challenge deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Challenges'
  */
 
   
@@ -336,10 +467,6 @@ router.post('/set_access_token',PlaidController.setAccessToken) // Set Access to
 router.get('/auth',PlaidController.getAuth) // Get auth information
 
 router.get('/transactions',PlaidController.getTransactions) // Get Transactions from plaid
-
-router.post('/user',PlaidController.createUser) // Create user
-
-router.get('/users',PlaidController.createLinkToken) // Get users
 
 router.get('/momerlin/transactions',PlaidController.getMomerlinTransactions) // Get transations from influxdb
 
@@ -359,10 +486,30 @@ router.get('/accounts',PlaidController.getItemAccount) // Get accounts
 
 router.get('/payment',PlaidController.getPayment) // Get payments list
 
+// ******* Users Api's ************ //
+
+router.post('/user/create',PlaidController.createUser) // Create user
+
+router.get('/users',PlaidController.createLinkToken) // Get users
+
+router.get('/user',PlaidController.getUser) // Get a particular user
+
+router.put('/user/update',PlaidController.updateUser) // Api to update a user
+
+router.delete('/user/delete',PlaidController.deleteUser) // Api to delete a user
+
 // ******* Challenges API's ******** //
 
-router.post('/challenge',ChallengesController.createChallenge) // Create challenge
+router.post('/challenge/create',ChallengesController.createChallenge) // Create challenge
 
 router.get('/challenges',ChallengesController.getChallenges) // Api to Get challenges 
+
+router.get('/challenge',ChallengesController.getChallengeInfo) // Api to get a particular challenge
+
+router.put('/challenge/update',ChallengesController.updateChallenge) // Api to update a challenge
+
+router.put('/challenge/join',ChallengesController.joinChallenge) // Api to join a challenge
+
+router.delete('/challenge/delete',ChallengesController.deleteChallenge) // Api to delete a challenge
 
 module.exports = router;

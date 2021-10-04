@@ -16,7 +16,11 @@ const UserSchema =new mongoose.Schema({
         type:String,
         default:''
     },
-    imageUrl:String
+    imageUrl:String,
+    active:{
+        type:Boolean,
+        default:false
+    }
 }, {timestamps: true});
 
 

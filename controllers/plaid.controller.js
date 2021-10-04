@@ -12,7 +12,8 @@ const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
 const PLAID_SECRET = process.env.PLAID_SECRET;
 const PLAID_ENV = process.env.PLAID_ENV || 'development';
 
-const {ReE, ReS, to} = require("../services/global.services")
+const {ReE, ReS, to} = require("../services/global.services");
+const { deleteChallenge } = require('./challenges.controllers');
 const influxClient = new Influx.InfluxDB({
   database: 'momerlin',
   host: 'localhost',
@@ -397,6 +398,64 @@ const createUser = async function (req, res) {
 }
 
 module.exports.createUser = createUser
+
+// Get a api info
+
+const getUser = async function (req,res) {
+  let user,err
+
+
+  [err,user] = await to(Users.findById(req.query.id))
+
+  if(err){
+      return ReE(res,err,400)
+  }
+  else{
+      return ReS(res,{message:"This user information is",user:user,success:true},200)
+  }
+}
+
+module.exports. getUser = getUser 
+
+//   Update Challenge
+
+const updateUser = async function(req,res) {
+    let err,user,id
+
+    id = req.query.id
+    [err,user] = await to(Users.findByIdAndUpdate(id,{$set:req.body},{new:true}))
+
+    if(err){
+
+        return ReE(res,{err,success:false},400)
+    }
+
+    else{
+
+        return ReS(res,{message:"user updated",user:user,success:true},200)
+    }
+}
+
+module.exports.updateUser = updateUser
+
+//   Delete Challenge
+
+const deleteUser = async function(req,res) {
+    let err,user,id,body
+    id = req.query.id
+    body = req.body
+    [err,user] = await to(Users.findByIdAndUpdate(id,{$set:{active:false}},{new:true}))
+
+    if(err){
+        return ReE(res,{message:"Error on retrieving user",err,success:false},400)
+    }
+
+    else{
+        return ReS(res,{message:"User deleted",user:user,success:true},200)
+    }
+}
+
+module.exports.deleteUser = deleteUser
   
   // Retrieve transactions from influxdb
   

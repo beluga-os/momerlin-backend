@@ -18,6 +18,7 @@ const ChallengeSchema =new mongoose.Schema({
     }],
     startAt: String,
     endAt: String,
+    wage: String,
     active: {
         type:Boolean,
         default:false
@@ -28,4 +29,4 @@ const ChallengeSchema =new mongoose.Schema({
 ChallengeSchema.plugin(mongoosePaginate); 
 
 
-const Users = module.exports = mongoose.model('challenges', ChallengeSchema);
+const Challenges = module.exports = mongoose.model('challenges', ChallengeSchema);
