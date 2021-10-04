@@ -33,7 +33,7 @@ const options = {
 		},
 		servers: [
       {
-        url:"https://52.66.200.27:8000/api"
+        url:"http://52.66.200.27:8000/api"
       },
 			{
 				url: "http://localhost:8000/api",
