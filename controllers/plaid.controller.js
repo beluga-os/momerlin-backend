@@ -1,10 +1,12 @@
 
+
+require('dotenv').config();
+
 const { Configuration, PlaidApi, PlaidEnvironments } = require('plaid');
 const util = require('util');
 const moment = require('moment');
 const Users = require("../models/user.model") 
 
-const { v4: uuidv4 } = require('uuid');
 const Influx = require('influx');
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
 const PLAID_SECRET = process.env.PLAID_SECRET;
