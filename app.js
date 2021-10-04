@@ -33,10 +33,10 @@ const options = {
 		},
 		servers: [
       {
-        url:"http://52.66.200.27:3007/app"
+        url:"http://52.66.200.27:3007/api"
       },
 			{
-				url: "http://localhost:3007/app",
+				url: "http://localhost:3007/api",
 			}
 		],
 	},
@@ -58,7 +58,7 @@ app.get('/', (req, res) => {
 
 const momerlin = require('./routes/momerlin');
 
-app.use('/app', momerlin);
+app.use('/api', momerlin);
 
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 
