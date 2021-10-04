@@ -9,7 +9,7 @@ const path = require('path');
 
 const app = express();
 
-const PORT = process.env.PORT || 3007;
+const PORT = process.env.PORT || 8000;
 
 
 const config = require('./config/config');
@@ -33,10 +33,10 @@ const options = {
 		},
 		servers: [
       {
-        url:"http://52.66.200.27:3007/api"
+        url:"https://52.66.200.27:8000/api"
       },
 			{
-				url: "http://localhost:3007/api",
+				url: "http://localhost:8000/api",
 			}
 		],
 	},
