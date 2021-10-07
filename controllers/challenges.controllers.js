@@ -20,7 +20,8 @@ const ObjectId = require('mongoose').Types.ObjectId;
           startAt: req.body.startAt ? req.body.startAt : "",
           endAt: req.body.endAt ? req.body.endAt : "",
           active: true,
-          wage: req.body.wage ? req.body.wage : ""
+          wage: req.body.wage ? req.body.wage : "",
+          total_amount: parseInt(req.body.wage) * parseInt(req.body.totalCompetitors)
       }
   
       let err,challenge
@@ -129,15 +130,25 @@ const joinChallenge = async function (req,res){
 
             else{
                 if(challenge !== null && challenge !== {} && challenge.active === true){
-                    challenge.competitors.push(userId)
 
-                    try {
-                        await challenge.save()
-                    } catch (error) {
-                        return ReE(res,error,400)
+                    if (challenge.competitors.length > challenge.totalCompetitors) {
+                        return ReE(res, { message: "Total members limit reached please try another challenge.", success: false }, 400)
                     }
+                    else {
+                        if (challenge.competitors.includes(userId)) {
+                            return ReE(res, { message: "You have already joined in this challenge", success: false }, 400)
+                        }
+                        else {
+                            challenge.competitors.push(userId)
+                            try {
+                                await challenge.save()
+                            } catch (error) {
+                                return ReE(res, error, 400)
+                            }
 
-                    return ReS(res,{message:"You have joined this challenge",success:true,challenge:challenge},200)
+                            return ReS(res, { message: "You have joined this challenge", success: true, challenge: challenge }, 200)
+                        }
+                    }
                 }
 
                 else{

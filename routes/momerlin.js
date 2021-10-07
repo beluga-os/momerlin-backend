@@ -3,6 +3,7 @@ const router = express.Router();
 
 const PlaidController = require('../controllers/plaid.controller')
 const ChallengesController = require('../controllers/challenges.controllers')
+const ChallengeTrackerController = require('../controllers/challengeTracker.controllers')
 
 // const isAuth = require('../middleware/isAuth');
 router.get('/', (req, res) => {
@@ -511,5 +512,17 @@ router.put('/challenge/update',ChallengesController.updateChallenge) // Api to u
 router.put('/challenge/join',ChallengesController.joinChallenge) // Api to join a challenge
 
 router.delete('/challenge/delete',ChallengesController.deleteChallenge) // Api to delete a challenge
+
+// ********** Challenge tracker API's ************ //
+
+router.post('/track/challenge',ChallengeTrackerController.trackChallenger) // Api to track challenge
+
+router.get('/track/challenger',ChallengeTrackerController.getByChallenger) // Api to get reocrd of a challenger
+
+router.get('/track/challenge/get',ChallengeTrackerController.getByChallenges) // Api to get rocord of a challenge
+
+router.get('/track/:id', ChallengeTrackerController.getChallenge)  // Api to get a reocrd of traking id
+
+router.get('/track/challenge/:id', ChallengeTrackerController.getTracking) // Api to get a users record on a particular challenge
 
 module.exports = router;

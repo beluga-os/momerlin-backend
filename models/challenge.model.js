@@ -19,6 +19,7 @@ const ChallengeSchema =new mongoose.Schema({
     startAt: String,
     endAt: String,
     wage: String,
+    winner_amount:Number,
     active: {
         type:Boolean,
         default:false
