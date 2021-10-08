@@ -133,6 +133,12 @@ router.get('/', (req, res) => {
  *         endAt:
  *           type: string
  *           description: Date of challenge ended
+ *         wage:
+ *           type: string
+ *           description: Entry fee of challenge
+ *         prize:
+ *           type: string
+ *           description: Winning prize
  *         active:
  *           type: boolean
  *           description: Challenge's active state
@@ -156,7 +162,7 @@ router.get('/', (req, res) => {
  *           description: Competitor id
  *         challenge:
  *           type: string
- *           type: Challange id
+ *           description: Challange id
  *         totalKm:
  *           type: string
  *           description: Total kilo meter of a challenge
@@ -494,7 +500,7 @@ router.get('/', (req, res) => {
  * @swagger
  * /track/challenge:
  *   post:
- *     summary:Track a challange
+ *     summary: Track a challenge
  *     tags: [ChallengeTracker]
  *     requestBody:
  *       required: true
@@ -509,6 +515,8 @@ router.get('/', (req, res) => {
  *           application/json:
  *             schema:
  *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/ChallengeTracker'
  * /track/challenger:
  *   get:
  *     parameters:
@@ -551,12 +559,6 @@ router.get('/', (req, res) => {
  *         required: true
  *     summary: Returns a particular Challenge track record
  *     tags: [ChallengeTracker]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/ChallengeTracker'
  *     responses:
  *       200:
  *         description: Challenge track record
@@ -567,13 +569,13 @@ router.get('/', (req, res) => {
  *               items:
  *                 $ref: '#/components/schemas/ChallengeTracker'
  * /track/challenge/:id:
- *   put:
+ *   get:
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *     summary: Returns a particular Challenge track record of a challenger
- *     tags: [Challenges]
+ *     tags: [ChallengeTracker]
  *     responses:
  *       200:
  *         description: Challenge track record of a challenger
@@ -582,7 +584,7 @@ router.get('/', (req, res) => {
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/Challenges'
+ *                 $ref: '#/components/schemas/ChallengeTracker'
  */
 
   
