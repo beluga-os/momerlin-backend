@@ -147,6 +147,35 @@ router.get('/', (req, res) => {
  *         startAt: 29/10/2021
  *         endAt: 06/11/2021
  *         active: true
+ * 
+ *     ChallengeTracker:
+ *       type: object
+ *       properties:
+ *         competitor:
+ *           type: string
+ *           description: Competitor id
+ *         challenge:
+ *           type: string
+ *           type: Challange id
+ *         totalKm:
+ *           type: string
+ *           description: Total kilo meter of a challenge
+ *         startAt:
+ *           type: string
+ *           description: Date of challenge started
+ *         endAt:
+ *           type: string
+ *           description: Date of challenge ended
+ *         kmReached:
+ *           type: number
+ *           description: Total km reached
+ *       example:
+ *         competitor: 654adf6s5dsdasd654asd564sa
+ *         challenge: 01sdg5641a65s4fsdgf564fb65
+ *         kmReached: 7
+ *         totalKm: 35
+ *         startAt: 29/10/2021
+ *         endAt: 06/11/2021
  */
 
  /**
@@ -446,6 +475,108 @@ router.get('/', (req, res) => {
  *     responses:
  *       200:
  *         description: Challenge deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Challenges'
+ */
+
+/**
+  * @swagger
+  * tags:
+  *   name: ChallengeTracker
+  *   description: Api's to track challenge performance
+  */
+
+  /**
+ * @swagger
+ * /track/challenge:
+ *   post:
+ *     summary:Track a challange
+ *     tags: [ChallengeTracker]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ChallengeTracker'
+ *     responses:
+ *       200:
+ *         description: Challenge tracked successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ * /track/challenger:
+ *   get:
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         required: true
+ *     summary: Returns the list of the challenger tracking record
+ *     tags: [ChallengeTracker]
+ *     responses:
+ *       200:
+ *         description: The list of challenger tracking record
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/ChallengeTracker'
+ * /track/:id:
+ *   get:
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *     summary: Returns the list of the challenge tracking record
+ *     tags: [ChallengeTracker]
+ *     responses:
+ *       200:
+ *         description: Returns the list of the challenge tracking record
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/ChallengeTracker'
+ * /track/challenge/get:
+ *   get:
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         required: true
+ *     summary: Returns a particular Challenge track record
+ *     tags: [ChallengeTracker]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ChallengeTracker'
+ *     responses:
+ *       200:
+ *         description: Challenge track record
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/ChallengeTracker'
+ * /track/challenge/:id:
+ *   put:
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *     summary: Returns a particular Challenge track record of a challenger
+ *     tags: [Challenges]
+ *     responses:
+ *       200:
+ *         description: Challenge track record of a challenger
  *         content:
  *           application/json:
  *             schema:
