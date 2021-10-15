@@ -11,7 +11,6 @@ const app = express();
 
 const PORT = process.env.PORT || 8000;
 
-
 const config = require('./config/config');
 
 const models = require("./models");

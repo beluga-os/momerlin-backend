@@ -459,15 +459,20 @@ module.exports.deleteUser = deleteUser
   
   // Retrieve transactions from influxdb
   
-  const getMomerlinTransactions = async function(request,response,next){
+  const getMomerlinTransactions = async function(request,response){
     
-    let address = request.query.address,limit,offset
+    let address,limit,offset
+
+    address = request.query.address?request.query.address.toString() : ''
+
     limit = request.query.limit || 10
 
-    offset = request.query.page ? (request.query.page > 1 ? ((request.query.offset -1) * limit): limit) : limit
+    offset = request.query.page ? (request.query.page > 1 ? ((request.query.page -1) * limit): 0) : 0
+
+    console.log("Checking address...",{address:address});
     try {
       const results = await influxClient.query(`
-      select * from transactions where address = ${address} order by time desc limit ${limit} offset ${offset}
+      SELECT * FROM transactions WHERE address = ${address} ORDER BY time DESC LIMIT ${limit} OFFSET ${offset}
     `);
     
       return response.json(results)
