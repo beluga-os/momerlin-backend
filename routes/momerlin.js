@@ -413,6 +413,22 @@ router.get('/', (req, res) => {
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Challenges'
+ * /user/challenges:
+ *   get:
+ *     parameters:
+ *       - in: query
+ *         name: id,page,limit
+ *     summary: Returns the list of all my challenges
+ *     tags: [Challenges]
+ *     responses:
+ *       200:
+ *         description: The list of my challenges
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Challenges'
  * /challenge:
  *   get:
  *     parameters:
@@ -490,11 +506,11 @@ router.get('/', (req, res) => {
  */
 
 /**
-  * @swagger
-  * tags:
-  *   name: ChallengeTracker
-  *   description: Api's to track challenge performance
-  */
+ * @swagger
+ * tags:
+ *   name: ChallengeTracker
+ *   description: Api's to track challenge performance
+ */
 
   /**
  * @swagger
@@ -537,7 +553,7 @@ router.get('/', (req, res) => {
  * /track/:id:
  *   get:
  *     parameters:
- *       - in: path
+ *       - in: params
  *         name: id
  *         required: true
  *     summary: Returns the list of the challenge tracking record
@@ -573,6 +589,9 @@ router.get('/', (req, res) => {
  *     parameters:
  *       - in: path
  *         name: id
+ *         required: true
+ *       - in: query
+ *         name: challenger
  *         required: true
  *     summary: Returns a particular Challenge track record of a challenger
  *     tags: [ChallengeTracker]
@@ -636,7 +655,9 @@ router.delete('/user/delete',PlaidController.deleteUser) // Api to delete a user
 
 router.post('/challenge/create',ChallengesController.createChallenge) // Create challenge
 
-router.get('/challenges',ChallengesController.getChallenges) // Api to Get challenges 
+router.get('/challenges',ChallengesController.getChallenges) // Api to Get all challenges 
+
+router.get('/user/challenges',ChallengesController.myChallenges) // Api to Get my challenges 
 
 router.get('/challenge',ChallengesController.getChallengeInfo) // Api to get a particular challenge
 

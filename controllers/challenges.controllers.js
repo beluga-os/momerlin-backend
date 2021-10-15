@@ -47,21 +47,90 @@ const ObjectId = require('mongoose').Types.ObjectId;
 //   Get Challenges
 
 const getChallenges = async function(req,res) {
-    let err,challenges
+    let err,challenges,options,query,page,limit
 
-    [err,challenges] = await to(Challenges.find({active:true}).populate({path:"createdBy",select:'_id fullName'}))
+    page = req.query.page ? req.query.page : 1
 
-    if(err){
+    limit = req.query.limit ? req.query.limit : 10
+
+    options = {
+        page: page,
+        limit: limit,
+        sort: {
+            createdAt: -1,
+        },
+        populate: ([{
+            path: 'createdBy',
+            select: ['fullName', '_id']
+        },
+        {
+            path: 'competitors',
+            select: ['fullName', '_id']
+        }])
+    }
+
+    query={active:true}
+
+    try {
+        challenges= await Challenges.paginate(query, options).then(function (docs, err) {
+
+            if(err) ReE(res,{ err },400)
+        
+            return ReS(res, { message: "Challenges are", success: true, challenges: docs }, 200)
+        })
+
+    } catch (error) {
         return ReE(res,{message:"Error on retrieving challenge",err,success:false},400)
     }
-
-    else{
-        return ReS(res,{message:"The Challenge list are",challenges:challenges,success:true},200)
-    }
+    
 }
 
 module.exports.getChallenges = getChallenges
 
+//   My Challenges
+
+const myChallenges = async function (req,res) {
+    
+    let err,challenges,options,query,page,limit,id
+
+    id = req.query.id
+    page = req.query.page ? req.query.page : 1
+
+    limit = req.query.limit ? req.query.limit : 10
+
+    options = {
+        page: page,
+        limit: limit,
+        sort: {
+            createdAt: -1,
+        },
+        populate: ([{
+            path: 'createdBy',
+            select: ['fullName', '_id']
+        },
+        {
+            path: 'competitors',
+            select: ['fullName', '_id']
+        }])
+    }
+
+    query={createdBy:id,active:true}
+
+    try {
+        challenges= await Challenges.paginate(query, options).then(function (docs, err) {
+
+            if(err) ReE(res,{ message:"error",success:false,err },400)
+        
+            return ReS(res, { message: "My Challenges are", success: true, challenges: docs }, 200)
+        })
+
+    } catch (error) {
+        return ReE(res,{message:"Error on fetching my challenge",error},400)
+    }
+
+}
+
+module.exports.myChallenges = myChallenges
 //   Update Challenge
 
 const updateChallenge = async function(req,res) {

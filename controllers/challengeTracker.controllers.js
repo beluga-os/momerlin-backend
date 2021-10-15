@@ -4,6 +4,8 @@ const Challenges = require("../models/challenge.model")
 const Users = require("../models/user.model") 
 const ChallengeTracker = require("../models/challengeTracker.model") 
 const {ReE, ReS, to} = require("../services/global.services")
+const ObjectId = require('mongoose').Types.ObjectId;
+
   // Create challange
   
   const trackChallenger = async function(req,res){
@@ -103,22 +105,41 @@ const {ReE, ReS, to} = require("../services/global.services")
 //   Get records by Challenges
 
 const getByChallenges = async function(req,res) {
-    let err,challenges
+    let err,challenges,options,query,page,limit
 
     let challenge = req.query.id
 
-    [err,challenges] = await to(ChallengeTracker.find({challenge:challenge})
-    .populate({path:"competitor",select:'_id fullName'})
-    .populate('challenge')
-    )
+    challenger = req.query.challenger
 
-    if(err){
-        return ReE(res,{message:"Error on retrieving challenge",err,success:false},400)
+    page = req.query.page ? req.query.page : 1
+
+    limit = req.query.limit ? req.query.limit : 10
+
+    options = {
+        page: page,
+        limit: limit,
+        sort: {
+            createdAt: -1,
+        },
+        populate: ([{path:"competitor",select:'_id fullName'},
+        'challenge'])
     }
 
-    else{
-        return ReS(res,{message:"The Challenge list are",challenges:challenges,success:true},200)
+    query={challenge:ObjectId(challenge)}
+
+    try {
+        record= await ChallengeTracker.paginate(query, options).then(function (docs, err) {
+
+            if(err) ReE(res,{ err },400)
+        
+            return ReS(res, { message: "The Challenge tracking list are", success: true, challenges: docs }, 200)
+        })
+
+    } catch (error) {
+        return ReE(res,{message:"Error on retrieving challenge tracking list",err,success:false},400)
     }
+
+    
 }
 
 module.exports.getByChallenges = getByChallenges
@@ -127,22 +148,40 @@ module.exports.getByChallenges = getByChallenges
 //   Get records by Challengers
 
 const getByChallenger = async function(req,res) {
-    let err,challenger
+    let err,challenger,options,query,page,limit
 
     let id = req.query.id
 
-    [err,challenger] = await to(ChallengeTracker.find({competitor:id})
-    .populate({path:"competitor",select:'_id fullName'})
-    .populate('challenge')
-    )
+    challenger = req.query.challenger
 
-    if(err){
-        return ReE(res,{message:"Error on retrieving challenge",err,success:false},400)
+    page = req.query.page ? req.query.page : 1
+
+    limit = req.query.limit ? req.query.limit : 10
+
+    options = {
+        page: page,
+        limit: limit,
+        sort: {
+            createdAt: -1,
+        },
+        populate: ([{path:"competitor",select:'_id fullName'},
+        'challenge'])
     }
 
-    else{
-        return ReS(res,{message:"The Challenger tracking list are",challenger:challenger,success:true},200)
+    query={competitor:ObjectId(id)}
+
+    try {
+        record= await ChallengeTracker.paginate(query, options).then(function (docs, err) {
+
+            if(err) ReE(res,{ err },400)
+        
+            return ReS(res, { message: "The Challenger tracking list are", success: true, challenges: docs }, 200)
+        })
+
+    } catch (error) {
+        return ReE(res,{message:"Error on retrieving challenger tracking list",err,success:false},400)
     }
+
 }
 
 module.exports.getByChallenger = getByChallenger
@@ -150,24 +189,40 @@ module.exports.getByChallenger = getByChallenger
 //   Get record of a Challenger on a particular challenge
 
 const getChallenge = async function(req,res) {
-    let err,record,challenger,challenge
+    let err,record,challenger,challenge,options,query,page,limit
 
     challenger = req.query.challenger
 
     challenge = req.params.id
 
-    [err,record] = await to(ChallengeTracker.find({competitor:challenger,challenge:challenge})
-    .populate({path:"competitor",select:'_id fullName'})
-    .populate('challenge')
-    )
+    page = req.query.page ? req.query.page : 1
 
-    if(err){
-        return ReE(res,{message:"Error on retrieving challenge",err,success:false},400)
+    limit = req.query.limit ? req.query.limit : 10
+
+    options = {
+        page: page,
+        limit: limit,
+        sort: {
+            createdAt: -1,
+        },
+        populate: ([{path:"competitor",select:'_id fullName'},
+        'challenge'])
     }
 
-    else{
-        return ReS(res,{message:"The Challenger tracking list are",record:record,success:true},200)
+    query={competitor:ObjectId(challenger),challenge:ObjectId(challenge)}
+
+    try {
+        record= await ChallengeTracker.paginate(query, options).then(function (docs, err) {
+
+            if(err) ReE(res,{ err },400)
+        
+            return ReS(res, { message: "The Challenger tracking list of a challenge", success: true, challenges: docs }, 200)
+        })
+
+    } catch (error) {
+        return ReE(res,{message:"Error on retrieving tracking list of challenge by user",err,success:false},400)
     }
+
 }
 
 module.exports.getChallenge = getChallenge
