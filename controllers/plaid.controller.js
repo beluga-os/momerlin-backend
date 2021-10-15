@@ -461,11 +461,13 @@ module.exports.deleteUser = deleteUser
   
   const getMomerlinTransactions = async function(request,response,next){
     
-    let address = request.query.address 
-    let limit = request.query.limit || 10
+    let address = request.query.address,limit,offset
+    limit = request.query.limit || 10
+
+    offset = request.query.page ? (request.query.page > 1 ? ((request.query.offset -1) * limit): limit) : limit
     try {
       const results = await influxClient.query(`
-      select * from transactions where address = ${address} order by time desc limit ${limit}
+      select * from transactions where address = ${address} order by time desc limit ${limit} offset ${offset}
     `);
     
       return response.json(results)
