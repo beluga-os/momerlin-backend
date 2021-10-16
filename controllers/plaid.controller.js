@@ -13,7 +13,7 @@ const PLAID_SECRET = process.env.PLAID_SECRET;
 const PLAID_ENV = process.env.PLAID_ENV || 'development';
 
 const {ReE, ReS, to} = require("../services/global.services");
-const { deleteChallenge } = require('./challenges.controllers');
+
 const influxClient = new Influx.InfluxDB({
   database: 'momerlin',
   host: 'localhost',
@@ -390,7 +390,7 @@ const getUser = async function (req,res) {
   let user,err
 
 
-  [err,user] = await to(Users.findById(req.query.id))
+  [err,user] = await to(Users.findOne({ethAddress:req.query.id}))
 
   if(err){
       return ReE(res,err,400)
@@ -444,29 +444,37 @@ module.exports.deleteUser = deleteUser
   
   // Retrieve transactions from influxdb
   
-  const getMomerlinTransactions = async function(request,response){
+const getMomerlinTransactions = async function(request,response){
     
     let address,limit,offset
 
-    address = request.query.address?request.query.address.toString() : ''
+    address = request.query.address?request.query.address : ''
 
     limit = request.query.limit || 10
 
     offset = request.query.page ? (request.query.page > 1 ? ((request.query.page -1) * limit): 0) : 0
 
-    console.log("Checking address...",{address:address});
     try {
-      const results = await influxClient.query(`
-      SELECT * FROM transactions WHERE address = ${address} ORDER BY time DESC LIMIT ${limit} OFFSET ${offset}
-    `);
+      let query
+
+      query = `select * from transactions
+      where address = ${Influx.escape.stringLit(address)}
+      order by time desc
+      limit ${limit}
+      offset ${offset}`
+
+      await influxClient.query(query).then(result => {
+        return ReS(response,{message:"Transactions list is",success:true,transactions:result},200)
+      }).catch(err => {
+        response.status(500).send(err.stack)
+      })
     
-      return response.json(results)
     } catch (err) {
       console.log(`Error while processing ${err}`);
     }
   }
 
-  module.exports.getMomerlinTransactions = getMomerlinTransactions
+module.exports.getMomerlinTransactions = getMomerlinTransactions
 
   // Retrieve Investment Transactions for an Item
   
