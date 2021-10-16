@@ -238,6 +238,9 @@ const getTransactions =  async function (request, response, next) {
     let paginatedResponse
     try {
       const result = await client.transactionsGet(configs);
+
+      console.log("Checking result...",result);
+
       let transactions = result.data.transactions;
       const total_transactions = result.data.total_transactions;
   
@@ -245,23 +248,11 @@ const getTransactions =  async function (request, response, next) {
   
       // transactions and retrieve all available data
   
-      while (transactions.length < total_transactions) {
-        const paginatedRequest = {
-          access_token: ACCESS_TOKEN,
-          start_date: startDate,
-          end_date: endDate,
-          options: {
-            offset: transactions.length,
-          },
-        };
-        paginatedResponse = await client.transactionsGet(paginatedRequest);
-        transactions = transactions.concat(
-          paginatedResponse.data.transactions,
-        );
-      }
       let recent
       try {
-        recent = await influxClient.query(`select * from transactions order by time desc limit 1`)
+        recent = await influxClient.query(`select * from transactions
+        where address = ${Influx.escape.stringLit(address)}
+        order by time desc`)
       } catch (error) {
        console.log("Error while retrieving from db..",error); 
       }
@@ -309,7 +300,7 @@ const getTransactions =  async function (request, response, next) {
       try {
         await influxClient.writePoints(rows)
           .catch(err => {
-            console.error(`Error saving data to InfluxDB! ${err.stack}`)
+            console.error(`Error saving data to InfluxDB! ${err}`)
           });
       } catch (error) {
         console.log("Checking db error....",error.message);
