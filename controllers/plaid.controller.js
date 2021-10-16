@@ -235,29 +235,27 @@ const getTransactions =  async function (request, response, next) {
       start_date: startDate,
       end_date: endDate
     };
-    let paginatedResponse
+    
+    console.log("Checking address...",address);
     try {
-      const result = await client.transactionsGet(configs);
+      let result
+      
+      result = await client.transactionsGet(configs);
 
-      console.log("Checking result...",result);
-
-      let transactions = result.data.transactions;
-      const total_transactions = result.data.total_transactions;
-  
-      // Manipulate the offset parameter to paginate
-  
-      // transactions and retrieve all available data
+      let transactions
+      transactions = result.data.transactions;
   
       let recent
       try {
         recent = await influxClient.query(`select * from transactions
-        where address = ${Influx.escape.stringLit(address)}
+        where address = ${Influx.escape.stringLit(request.query.address)}
         order by time desc`)
       } catch (error) {
        console.log("Error while retrieving from db..",error); 
       }
       // Preparing rows to insert into influxDB
       let rows = []
+      
       transactions.map((t) => {
         let sat = Math.ceil(t.amount) - t.amount
           let time = moment(t.date).utc().valueOf()
@@ -267,7 +265,7 @@ const getTransactions =  async function (request, response, next) {
             tags: {
               name: t.name.replace(/[^a-zA-Z- ]/g, ""),
               amount: t.amount,
-              address: address,
+              address: request.query.address,
               iso_currency_code: t.iso_currency_code,
               sats: sat,
               createdAt: moment(t.date).utc().valueOf()
@@ -303,7 +301,7 @@ const getTransactions =  async function (request, response, next) {
             console.error(`Error saving data to InfluxDB! ${err}`)
           });
       } catch (error) {
-        console.log("Checking db error....",error.message);
+        console.log("Checking db error....",error);
       }
      
       response.json(result.data);
