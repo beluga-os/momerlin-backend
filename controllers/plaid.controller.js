@@ -361,23 +361,8 @@ const createUser = async function (req, res) {
 
   reqUser.password = password
 
-  if (typeof reqUser.fullName === 'undefined' || reqUser.fullName === '') {
-    return ReE(res, { message: 'Name was not entered', "success": false, user: '' }, 400)
-  }
-  else if (typeof reqUser.btcAddress === 'undefined' || reqUser.btcAddress === '') {
-    return ReE(res, { message: 'btcAddress was not entered', "success": false, user: '' }, 400)
-  }
-
-  else if (typeof reqUser.ethAddress === 'undefined' || reqUser.ethAddress === '') {
+  if (typeof reqUser.ethAddress === 'undefined' || reqUser.ethAddress === '') {
     return ReE(res, { message: 'Please enter ethAddress', "success": false, user: '' }, 400)
-  }
-
-  else if (typeof reqUser.tronAddress === 'undefined' || reqUser.tronAddress === '') {
-    return ReE(res, { message: 'Please enter tron address', "success": false, user: '' }, 400)
-  }
-
-  else if (typeof reqUser.seedEncrypted === 'undefined' || reqUser.seedEncrypted === '') {
-    return ReE(res, { message: 'Please enter seed encrypt', "success": false, user: '' }, 400)
   }
 
   else {
