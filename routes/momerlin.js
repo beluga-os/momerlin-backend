@@ -667,6 +667,8 @@ router.put('/challenge/join',ChallengesController.joinChallenge) // Api to join 
 
 router.delete('/challenge/delete',ChallengesController.deleteChallenge) // Api to delete a challenge
 
+router.get('/challenge/joined',ChallengesController.joinedChallenges) // Api to get joined challenges
+
 // ********** Challenge tracker API's ************ //
 
 router.post('/track/challenge',ChallengeTrackerController.trackChallenger) // Api to track challenge

@@ -11,6 +11,7 @@ const ChallengeTrackerSchema =new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'challenges'
     },
+    joinedAt:Date,
     startAt: String,
     endAt: String,
     totalkm:String,

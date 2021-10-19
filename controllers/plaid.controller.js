@@ -310,7 +310,7 @@ const getTransactions =  async function (request, response, next) {
   
     catch (error) {
       // prettyPrintResponse(error.response);
-      console.log("Get transaction error....", error.message);
+      console.log("Get transaction error....", error);
       return response.json(formatError(error));
     }
   }

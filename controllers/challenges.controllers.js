@@ -198,17 +198,26 @@ const joinChallenge = async function (req,res){
             }
 
             else{
+
                 if(challenge !== null && challenge !== {} && challenge.active === true){
 
                     if (challenge.competitors.length > challenge.totalCompetitors) {
                         return ReE(res, { message: "Total members limit reached please try another challenge.", success: false }, 400)
                     }
                     else {
-                        if (challenge.competitors.includes(userId)) {
-                            return ReE(res, { message: "You have already joined in this challenge", success: false }, 400)
+                        
+                        let hasJoined
+
+                        if(challenge.competitors.length > 0){
+                            hasJoined = challenge.competitors.filter( data => data.userId.toString() === userId)
                         }
-                        else {
-                            challenge.competitors.push(userId)
+
+                        else{
+                            hasJoined = []
+                        }
+
+                        if (hasJoined.length < 1) {
+                            challenge.competitors.push({ userId: userId, joinedAt: moment().format() })
                             try {
                                 await challenge.save()
                             } catch (error) {
@@ -217,7 +226,12 @@ const joinChallenge = async function (req,res){
 
                             return ReS(res, { message: "You have joined this challenge", success: true, challenge: challenge }, 200)
                         }
+
+                        else{
+                            return ReE(res,{message:"You have already joined in this challenge",success:false},400)
+                        }
                     }
+                  
                 }
 
                 else{
@@ -232,6 +246,83 @@ const joinChallenge = async function (req,res){
 }
 
 module.exports.joinChallenge = joinChallenge
+
+// Get joined challenges
+
+const joinedChallenges = async function (req,res){
+    let userId
+
+    userId = req.query.id
+
+    let err,user
+
+    [err,user] = await to (Users.findById(userId))
+
+    if(err){
+        return ReE(res,err,400)
+    }
+
+    else {
+        if (user !== null && user !== {} && user !== undefined) {
+            let error, joinedChallenges, options, page, limit, query
+
+            limit = req.query.limit
+
+            options = {
+                page: page,
+                limit: limit,
+                sort: {
+                    createdAt: -1,
+                },
+                populate: ([{
+                    path: 'createdBy',
+                    select: ['fullName', '_id']
+                },
+                {
+                    path: 'competitors',
+                    select: ['fullName', '_id']
+                }])
+            }
+
+
+            query = [
+                // Initial document match (uses index, if a suitable one is available)
+                { $match: { 'competitors': { $elemMatch: { userId: ObjectId(userId) } } } },
+
+                // Expand the scores array into a stream of documents
+                { $unwind: '$competitors' },
+
+                // { $match: {
+                //     'competitors.userId': ObjectId(userId)
+                // }},
+                // Sort in descending order
+                {
+                    $sort: {
+                        'competitors.joinedAt': -1
+                    }
+                }
+            ]
+
+            try {
+                Challenges.aggregatePaginate(Challenges.aggregate(query), options, function (err, results) {
+                    if (err) {
+                        return ReE(res, error, 400)
+                    }
+                    else {
+                        return ReS(res, { message: "Challenges you have joined", success: true, challenges: results }, 200)
+                    }
+                })
+            } catch (error) {
+                return ReE(res, error, 400)
+            }
+        }
+        else {
+            return ReE(res, { message: "Invalid user..", success: false }, 400)
+        }
+    }
+}
+
+module.exports.joinedChallenges = joinedChallenges
 
 // Get a api info
 

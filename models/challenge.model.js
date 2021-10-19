@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2')
 const Schema = mongoose.Schema;
+var aggregatePaginate = require("mongoose-aggregate-paginate-v2");
 
 const ChallengeSchema =new mongoose.Schema({
     mode: String,
@@ -13,8 +14,13 @@ const ChallengeSchema =new mongoose.Schema({
         ref: 'users'
     },
     competitors: [{
-        type: Schema.Types.ObjectId,
-        ref: 'users'
+        userId: {
+            type: Schema.Types.ObjectId,
+            ref: 'users'
+        },
+        joinedAt: {
+            type: Date
+        }
     }],
     startAt: String,
     endAt: String,
@@ -29,5 +35,6 @@ const ChallengeSchema =new mongoose.Schema({
 
 ChallengeSchema.plugin(mongoosePaginate); 
 
+ChallengeSchema.plugin(aggregatePaginate);
 
 const Challenges = module.exports = mongoose.model('challenges', ChallengeSchema);
