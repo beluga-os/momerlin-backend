@@ -34,7 +34,8 @@ const ObjectId = require('mongoose').Types.ObjectId;
               let err,challenger
 
               if(user){
-                [err,challenger] = await to(ChallengeTracker.find({competitor:body.competitor}))
+                [err,challenger] = await to(ChallengeTracker.find({competitor:body.competitor,challenge:body.challenge})
+                .populate("challenge"))
 
                 if(err){
                     return ReE(res, { message: "Error on checking challenger is active", success: false, err }, 400)
@@ -45,15 +46,34 @@ const ObjectId = require('mongoose').Types.ObjectId;
                     let challengeTracker
 
                     if (challenger.length > 0) {
-                       [err,challengeTracker] = await to(ChallengeTracker.findOneAndUpdate({competitor:body.competitor},body))
 
-                       if(err){
-                        return ReE(res, { message: "Error on updating challenger", success: false, err }, 400)
-                       }
+                        if (challenger[0].challenge) {
 
-                       else{
-                        return ReS(res, { message: "Challenger record updated successfully", challengeTracker: challengeTracker, success: true }, 200)
-                       }
+                            if ((parseInt(challenger[0].challenge.streakDays) >= parseInt(body.streakNo)) && challenger[0].status !== 'completed') {
+
+                                body.status = parseInt(challenger[0].challenge.streakDays) === parseInt(body.streakNo) ? "completed" : "in progress"
+
+                                console.log("Checking status....",body.status);
+
+                                [err, challengeTracker] = await to(ChallengeTracker.findOneAndUpdate({ competitor: body.competitor, challenge: body.challenge }, body))
+
+                                if (err) {
+                                    return ReE(res, { message: "Error on updating challenger", success: false, err }, 400)
+                                }
+
+                                else {
+                                    return ReS(res, { message: parseInt(challenger[0].challenge.streakDays) === parseInt(body.streakNo) ? "Challenge Completed Thank you for participating." : "Challenger record updated successfully", challengeTracker: challengeTracker, success: true }, 200)
+                                }
+                            }
+                            else {
+                                return ReS(res, { message: "Challenge Completed Thank you for participating.", success: false, err }, 200)
+                            }
+                        }
+
+                        else {
+                            return ReS(res, { message: "Invalid Challenge.", success: false, err }, 400)
+                        }
+
                     }
 
                     else{
@@ -67,6 +87,7 @@ const ObjectId = require('mongoose').Types.ObjectId;
                             let err,challengeTracker
 
                             if (challenge) {
+                                body.status = "in progress"
                                 [err, challengeTracker] = await to(ChallengeTracker.create(body))
 
                                 if (err) {

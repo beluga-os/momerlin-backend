@@ -11,11 +11,15 @@ const ChallengeTrackerSchema =new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'challenges'
     },
-    joinedAt:Date,
     startAt: String,
     endAt: String,
     totalkm:String,
+    streakNo:Number,
     kmreached:String,
+    status:{
+        type:String,
+        default:"in progress"
+    }
 }, {timestamps: true});
 
 
