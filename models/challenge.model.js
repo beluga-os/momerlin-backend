@@ -22,10 +22,14 @@ const ChallengeSchema =new mongoose.Schema({
             type: Date
         }
     }],
-    startAt: String,
-    endAt: String,
+    startAt: Date,
+    endAt: Date,
     wage: String,
     prize:Number,
+    winners:[{
+        type:Schema.Types.ObjectId,
+        ref:'users'
+}],
     active: {
         type:Boolean,
         default:false

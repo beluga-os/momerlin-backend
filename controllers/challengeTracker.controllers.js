@@ -5,6 +5,7 @@ const Users = require("../models/user.model")
 const ChallengeTracker = require("../models/challengeTracker.model") 
 const {ReE, ReS, to} = require("../services/global.services")
 const ObjectId = require('mongoose').Types.ObjectId;
+const { ReplicaModifications } = require('@aws-sdk/client-s3');
 
   // Create challange
   
@@ -274,3 +275,82 @@ const getTracking = async function(req,res){
 }
 
 module.exports.getTracking = getTracking
+
+const getLeaders = async function (req,res) {
+    
+    let err,leaders
+
+    [err,leaders] = await to(ChallengeTracker.find({ status: 'completed' }).limit(5).sort({totalkm:-1})
+    .populate([{path:"competitor",select:'_id fullName'},
+    'challenge']))
+
+    if(err){
+        return ReE(res,{err},400)
+    }
+
+    else{
+        return ReS(res,{message:"The Leaderboard details are",success:true,leaders:leaders},200)
+    }
+}
+module.exports.getLeaders = getLeaders
+
+const getChallengeWinner = async function (req,res) {
+    let winners,err
+
+    [err,winners] = await to (ChallengeTracker.find({challenge:ObjectId(req.params.id), status: 'completed' }).limit(5)
+    .populate([{path:"competitor",select:'_id fullName'},
+    'challenge']))
+
+    if(err){
+        return ReE(res,{err},400)
+    }
+
+    else{
+        console.log("Checking result",winners);
+        return ReS(res,{message:"Winners list is ",success:true,winners:winners},200)
+    }
+
+}
+
+module.exports.getChallengeWinner = getChallengeWinner
+
+const calculateWinner = async function (req,res) {
+
+    let id
+    id = req.query.id
+
+    if (id) {
+        let competitors, err
+        [err, competitors] = await to(ChallengeTracker.find({ challenge: ObjectId(id), status: 'completed' })
+            .populate([{ path: "competitor", select: '_id fullName' },
+                'challenge']))
+        if (err) {
+            return ReE(res, { err }, 400)
+        }
+        else {
+            let prize,winners = []
+                prize = parseInt((competitors[0].challenge.wage * parseInt(competitors[0].challenge.totalCompetitors)) / competitors.length)
+            if(competitors.length > 0){
+                
+                competitors.map((data,index)=>{
+                    winners.push(data.competitor._id)
+                })
+            }
+                    console.log("Checking winners...",winners);
+
+            let err,challenge,body
+
+            body = {"winners":winners}
+
+            [err,challenge] = await to(Challenges.findByIdAndUpdate(req.query.id,{$set:body},{new:true}))
+
+            if(err){
+                return ReE(res,{err},400)
+            }
+
+            return ReS(res, { message: "Winners list is ", success: true,challenge, winners: competitors,prize:prize }, 200)
+        }
+    }
+}
+
+module.exports.calculateWinner = calculateWinner

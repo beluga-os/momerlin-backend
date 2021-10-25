@@ -17,11 +17,11 @@ const ObjectId = require('mongoose').Types.ObjectId;
           totalKm: req.body.totalKm ? req.body.totalKm : "",
           createdBy: req.body.createdBy ? req.body.createdBy : "",
           competitors: req.body.competitors ? req.body.competitors : [],
-          startAt: req.body.startAt ? req.body.startAt : "",
-          endAt: req.body.endAt ? req.body.endAt : "",
+          startAt: moment().format(),
+          endAt: moment().add(req.body.streakDays,'days').format(),
           active: true,
           wage: req.body.wage ? req.body.wage : "",
-          total_amount: parseInt(req.body.wage) * parseInt(req.body.totalCompetitors)
+          prize: parseInt(req.body.wage) * parseInt(req.body.totalCompetitors)
       }
   
       let err,challenge
@@ -174,6 +174,7 @@ module.exports.deleteChallenge = deleteChallenge
 // Join a challenge
 
 const joinChallenge = async function (req,res){
+
     let userId,challengeId
 
     userId = req.query.id
@@ -201,46 +202,53 @@ const joinChallenge = async function (req,res){
 
                 if(challenge !== null && challenge !== {} && challenge.active === true){
 
-                    if (challenge.competitors.length > challenge.totalCompetitors) {
-                        return ReE(res, { message: "Total members limit reached please try another challenge.", success: false }, 400)
-                    }
-                    else {
-                        
-                        let hasJoined
+                    let isEnded = moment().diff(challenge.endAt, 'days')
 
-                        if(challenge.competitors.length > 0){
-                            hasJoined = challenge.competitors.filter( data => data.userId.toString() === userId)
+                    if (isEnded <= 0) {
+                        if (challenge.competitors.length > challenge.totalCompetitors) {
+                            return ReE(res, { message: "Total members limit reached please try another challenge.", success: false }, 400)
                         }
+                        else {
 
-                        else{
-                            hasJoined = []
-                        }
+                            let hasJoined
 
-                        if (hasJoined.length < 1) {
-                            challenge.competitors.push({ userId: userId, joinedAt: moment().format() })
-                            try {
-                                await challenge.save()
-                            } catch (error) {
-                                return ReE(res, error, 400)
+                            if (challenge.competitors.length > 0) {
+                                hasJoined = challenge.competitors.filter(data => data.userId.toString() === userId)
                             }
 
-                            return ReS(res, { message: "You have joined this challenge", success: true, challenge: challenge }, 200)
-                        }
+                            else {
+                                hasJoined = []
+                            }
 
-                        else{
-                            return ReE(res,{message:"You have already joined in this challenge",success:false},400)
+                            if (hasJoined.length < 1) {
+                                challenge.competitors.push({ userId: userId, joinedAt: moment().format() })
+                                try {
+                                    await challenge.save()
+                                } catch (error) {
+                                    return ReE(res, error, 400)
+                                }
+
+                                return ReS(res, { message: "You have joined this challenge", success: true, challenge: challenge }, 200)
+                            }
+
+                            else {
+                                return ReE(res, { message: "You have already joined in this challenge", success: false }, 400)
+                            }
                         }
-                    }
-                  
+                  }
+
+                  else{
+                    return ReE(res,{message:"Challenge is completed.",success:false},400)
+                  }
                 }
 
                 else{
-                    return ReE(res,{message:"Invalid challenge..",success:false},400)
+                    return ReE(res,{message:"Invalid challenge.",success:false},400)
                 }
             }
         }
         else{
-            return ReE(res,{message:"Invalid user..",success:false},400)
+            return ReE(res,{message:"Invalid user.",success:false},400)
         }
     }
 }
@@ -292,9 +300,9 @@ const joinedChallenges = async function (req,res){
                 // Expand the scores array into a stream of documents
                 { $unwind: '$competitors' },
 
-                // { $match: {
-                //     'competitors.userId': ObjectId(userId)
-                // }},
+                { $match: {
+                    'competitors.userId': ObjectId(userId)
+                }},
                 // Sort in descending order
                 {
                     $sort: {
@@ -309,6 +317,10 @@ const joinedChallenges = async function (req,res){
                         return ReE(res, error, 400)
                     }
                     else {
+                        let records
+                        // if(results.docs.length > 0){
+                        //     records = results.docs.filter(data => data.competitors.userId.toString() === userId)
+                        // }
                         return ReS(res, { message: "Challenges you have joined", success: true, challenges: results }, 200)
                     }
                 })
