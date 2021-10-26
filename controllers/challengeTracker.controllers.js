@@ -329,14 +329,13 @@ const calculateWinner = async function (req,res) {
         }
         else {
             let prize,winners = []
-                prize = parseInt((competitors[0].challenge.wage * parseInt(competitors[0].challenge.totalCompetitors)) / competitors.length)
+                prize = parseInt((competitors[0].challenge.prize - (competitors[0].challenge.prize * parseInt(competitors[0].challenge.percentage))) / competitors.length)
             if(competitors.length > 0){
                 
                 competitors.map((data,index)=>{
                     winners.push(data.competitor._id)
                 })
             }
-                    console.log("Checking winners...",winners);
 
             let err,challenge,body
 
@@ -348,7 +347,7 @@ const calculateWinner = async function (req,res) {
                 return ReE(res,{err},400)
             }
 
-            return ReS(res, { message: "Winners list is ", success: true,challenge, winners: competitors,prize:prize }, 200)
+            return ReS(res, { message: "Winners list is ", success: true,prize:prize , winners: competitors }, 200)
         }
     }
 }

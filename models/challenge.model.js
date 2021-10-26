@@ -26,6 +26,8 @@ const ChallengeSchema =new mongoose.Schema({
     endAt: Date,
     wage: String,
     prize:Number,
+    commissionEnabled: Boolean,
+    percentage:String,
     winners:[{
         type:Schema.Types.ObjectId,
         ref:'users'

@@ -17,6 +17,8 @@ const ObjectId = require('mongoose').Types.ObjectId;
           totalKm: req.body.totalKm ? req.body.totalKm : "",
           createdBy: req.body.createdBy ? req.body.createdBy : "",
           competitors: req.body.competitors ? req.body.competitors : [],
+          commissionEnabled: req.body?.percentage > 0 ? true :false,
+          percentage: req.body.percentage ? (req.body.percentage/100) : 0,
           startAt: moment().format(),
           endAt: moment().add(req.body.streakDays,'days').format(),
           active: true,
