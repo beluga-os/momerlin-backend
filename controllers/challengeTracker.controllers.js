@@ -5,7 +5,7 @@ const Users = require("../models/user.model")
 const ChallengeTracker = require("../models/challengeTracker.model") 
 const {ReE, ReS, to} = require("../services/global.services")
 const ObjectId = require('mongoose').Types.ObjectId;
-const { ReplicaModifications } = require('@aws-sdk/client-s3');
+const axios = require('axios')
 
   // Create challange
   
@@ -353,3 +353,47 @@ const calculateWinner = async function (req,res) {
 }
 
 module.exports.calculateWinner = calculateWinner
+
+const getUserData = async function (req,res){
+
+    let err,data,url,token
+
+    token = "Bearer ya29.a0ARrdaM-6uRVzgTKJCK3MoqkpWCygG_bQLKKZwgCpPPlVDjoVH3XdN0Ud378jdpzMlkcF8XkRt0vBFH8ZrcyhLmbA_S49UD6YLa0qcXWlAF3uDuIgDL6kfyri994rgbIoWphv7V7qCmdyDrupWOFnTnWJskNv"
+
+
+    url = 
+    
+    // `https://www.googleapis.com/fitness/v1/users/me/dataSources/derived:com.google.step_count.delta:1234567890:Example%20Manufacturer:ExampleTablet:1000001/datasets/1633094377000000000-1635254377000000000`
+    
+    'https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate'
+
+    let body = {    
+        "aggregateBy" : [{    
+            "dataSourceId": "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps"    
+        }],    
+        "bucketByTime": { "durationMillis": 86400000 }, // This is 24 hours    
+        "startTimeMillis": 1635170369000,   // Start time    
+        "endTimeMillis": 1635256769000  // End Time    
+    }
+
+    try {
+        data = await axios({
+        method: "POST",
+        headers:{
+            authorization: token
+        },
+        "Content-Type" : "application/json",
+        url : url,
+        data:body
+    })
+    } catch (error) {
+        return ReE(res,{error},400)
+    }
+     let result
+
+     result = await data
+        return ReS(res,{message:"Steps are..",success:true,data:result.data},200)
+    
+}
+
+module.exports.getUserData = getUserData
