@@ -20,6 +20,14 @@ const UserSchema =new mongoose.Schema({
     active:{
         type:Boolean,
         default:false
+    },
+    googleFitEnabled:{
+        type: Boolean,
+        default: false
+    },
+    healthKitEnabled:{
+        type: Boolean,
+        default: false
     }
 }, {timestamps: true});
 
