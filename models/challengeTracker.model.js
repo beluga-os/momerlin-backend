@@ -14,7 +14,10 @@ const ChallengeTrackerSchema =new mongoose.Schema({
     startAt: String,
     endAt: String,
     totalkm:String,
-    streakNo:Number,
+    streakNo:{
+        type:Number,
+        default:0
+    },
     kmreached:String,
     status:{
         type:String,

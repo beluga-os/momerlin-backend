@@ -686,6 +686,6 @@ router.get('/challenge/leaderboard', ChallengeTrackerController.getLeaders) // A
 
 router.get('/challenge/winners',ChallengeTrackerController.calculateWinner) // Api to get Challenge winners
 
-router.get('/user/data',ChallengeTrackerController.getUserData)
+// router.get('/user/data',ChallengeTrackerController.getUserData)
 
 module.exports = router;
