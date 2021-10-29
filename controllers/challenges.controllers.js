@@ -263,7 +263,7 @@ module.exports.joinChallenge = joinChallenge
 const joinedChallenges = async function (req,res){
     let userId
 
-    userId = req.query.id
+    userId = req.params.id
 
     let err,user
 
