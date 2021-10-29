@@ -682,7 +682,7 @@ router.get('/track/:id', ChallengeTrackerController.getTracking)  // Api to get 
 
 router.get('/track/challenge/:id', ChallengeTrackerController.getChallenge) // Api to get a users record on a particular challenge
 
-router.get('/challenge/leaderboard', ChallengeTrackerController.getLeaders) // Api to get leade board details
+router.get('/leaderboard', ChallengeTrackerController.getLeaders) // Api to get leade board details
 
 router.get('/challenge/winners/:id',ChallengeTrackerController.calculateWinner) // Api to get Challenge winners
 
