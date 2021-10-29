@@ -157,7 +157,7 @@ const getByChallenges = async function (req, res) {
         page: page,
         limit: limit,
         sort: {
-            createdAt: -1,
+            streakNo: -1,
         },
         populate: ([{ path: "competitor", select: '_id fullName' },
             'challenge'])
@@ -241,7 +241,7 @@ const getChallenge = async function (req, res) {
         page: page,
         limit: limit,
         sort: {
-            createdAt: -1,
+            streakNo: -1,
         },
         populate: ([{ path: "competitor", select: '_id fullName' },
             'challenge'])
@@ -296,7 +296,7 @@ const getLeaders = async function (req, res) {
 
     let err, leaders
 
-    [err, leaders] = await to(ChallengeTracker.find({ status: 'completed' }).limit(5).sort({ totalkm: -1 })
+    [err, leaders] = await to(ChallengeTracker.find({ status: 'completed' }).limit(5).sort({ streakNo: -1 })
         .populate([{ path: "competitor", select: '_id fullName' },
             'challenge']))
 
@@ -333,11 +333,11 @@ module.exports.getChallengeWinner = getChallengeWinner
 const calculateWinner = async function (req, res) {
 
     let id
-    id = req.query.id
+    id = req.params.id
 
     if (id) {
         let competitors, err
-        [err, competitors] = await to(ChallengeTracker.find({ challenge: ObjectId(id), status: 'completed' })
+        [err, competitors] = await to(ChallengeTracker.find({ challenge: ObjectId(req.params.id), status: 'completed' })
             .populate([{ path: "competitor", select: '_id fullName' },
                 'challenge']))
         if (err) {

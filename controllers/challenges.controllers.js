@@ -1,6 +1,7 @@
 
 const moment = require('moment');
 const Challenges = require("../models/challenge.model") 
+const ChallengeTracker = require("../models/challengeTracker.model")
 const Users = require("../models/user.model") 
 const {ReE, ReS, to} = require("../services/global.services")
 
@@ -344,13 +345,22 @@ const getChallengeInfo = async function (req,res) {
     let challenge,err
 
 
-    [err,challenge] = await to(Challenges.findById(req.query.id))
+    [err,challenge] = await to(Challenges.findById(req.params.id))
 
     if(err){
         return ReE(res,err,400)
     }
     else{
-        return ReS(res,{message:"This challenge information is",challenge:challenge,success:true},200)
+
+        let error,leaders
+
+        [error,leaders] = await to (ChallengeTracker.find({challenge:ObjectId(req.params.id)}).sort({streakNo:-1}).populate("competitor"))
+
+        if(error){
+            return ReE(res,{error},400)
+        }
+
+        return ReS(res,{message:"This challenge information is",challenge:challenge,leaders:leaders,success:true},200)
     }
 }
 

@@ -659,7 +659,7 @@ router.get('/challenges',ChallengesController.getChallenges) // Api to Get all c
 
 router.get('/user/challenges',ChallengesController.myChallenges) // Api to Get my challenges 
 
-router.get('/challenge',ChallengesController.getChallengeInfo) // Api to get a particular challenge
+router.get('/challenge/:id',ChallengesController.getChallengeInfo) // Api to get a particular challenge
 
 router.put('/challenge/update',ChallengesController.updateChallenge) // Api to update a challenge
 
@@ -684,7 +684,7 @@ router.get('/track/challenge/:id', ChallengeTrackerController.getChallenge) // A
 
 router.get('/challenge/leaderboard', ChallengeTrackerController.getLeaders) // Api to get leade board details
 
-router.get('/challenge/winners',ChallengeTrackerController.calculateWinner) // Api to get Challenge winners
+router.get('/challenge/winners/:id',ChallengeTrackerController.calculateWinner) // Api to get Challenge winners
 
 // router.get('/user/data',ChallengeTrackerController.getUserData)
 
