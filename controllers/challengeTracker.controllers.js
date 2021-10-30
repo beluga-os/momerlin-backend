@@ -6,7 +6,6 @@ const ChallengeTracker = require("../models/challengeTracker.model")
 const { ReE, ReS, to } = require("../services/global.services")
 const ObjectId = require('mongoose').Types.ObjectId;
 const axios = require('axios');
-const { getUsers } = require('./plaid.controller');
 
 // Create challange
 
@@ -102,6 +101,8 @@ const trackChallenger = async function (req, res) {
 
                             if (challenge) {
                                 body.status = "in progress"
+
+                                body.totalKm = distance
 
                                 body.streakNo = (challenge.totalkm <= distance) ? 1 : 0
 

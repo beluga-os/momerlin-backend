@@ -1,56 +1,57 @@
 
 const moment = require('moment');
-const Challenges = require("../models/challenge.model") 
+const Challenges = require("../models/challenge.model")
 const ChallengeTracker = require("../models/challengeTracker.model")
-const Users = require("../models/user.model") 
-const {ReE, ReS, to} = require("../services/global.services")
+const Users = require("../models/user.model")
+const { ReE, ReS, to } = require("../services/global.services")
+const axios = require('axios');
 
 const ObjectId = require('mongoose').Types.ObjectId;
-  // Create challange
-  
-  const createChallenge = async function(req,res){
-    
-      let body = {
-          mode: req.body.mode ? req.body.mode : "",
-          type: req.body.type ? req.body.type : "",
-          totalCompetitors: req.body.totalCompetitors ? req.body.totalCompetitors : "",
-          streakDays: req.body.streakDays ? req.body.streakDays : "",
-          totalKm: req.body.totalKm ? req.body.totalKm : "",
-          createdBy: req.body.createdBy ? req.body.createdBy : "",
-          competitors: req.body.competitors ? req.body.competitors : [],
-          commissionEnabled: req.body?.percentage > 0 ? true :false,
-          percentage: req.body.percentage ? (req.body.percentage/100) : 0,
-          startAt: moment().format(),
-          endAt: moment().add(req.body.streakDays,'days').format(),
-          active: true,
-          wage: req.body.wage ? req.body.wage : "",
-          prize: parseInt(req.body.wage) * parseInt(req.body.totalCompetitors)
-      }
-  
-      let err,challenge
+// Create challange
 
-      [err,challenge] = await to (Challenges.create(body))
+const createChallenge = async function (req, res) {
 
-      if(err){
-          return ReE(res,{message:"Error on create challenge",success:false,err},400) 
-      }
-      else{
+    let body = {
+        mode: req.body.mode ? req.body.mode : "",
+        type: req.body.type ? req.body.type : "",
+        totalCompetitors: req.body.totalCompetitors ? req.body.totalCompetitors : "",
+        streakDays: req.body.streakDays ? req.body.streakDays : "",
+        totalKm: req.body.totalKm ? req.body.totalKm : "",
+        createdBy: req.body.createdBy ? req.body.createdBy : "",
+        competitors: req.body.competitors ? req.body.competitors : [],
+        commissionEnabled: req.body?.percentage > 0 ? true : false,
+        percentage: req.body.percentage ? (req.body.percentage / 100) : 0,
+        startAt: moment().format(),
+        endAt: moment().add(req.body.streakDays, 'days').format(),
+        active: true,
+        wage: req.body.wage ? req.body.wage : "",
+        prize: parseInt(req.body.wage) * parseInt(req.body.totalCompetitors)
+    }
 
-      if(challenge !== null || challenge !== {}){
-          return ReS(res,{message:"Challenge created successfully",challenge:challenge,success:true},200)
-      }
-      else{
-          return ReE(res,{message:"Unable to retrieve challenges please try again.",success:false},400)
-      }
-      }
-  }
-  
-  module.exports.createChallenge = createChallenge
+    let err, challenge
+
+    [err, challenge] = await to(Challenges.create(body))
+
+    if (err) {
+        return ReE(res, { message: "Error on create challenge", success: false, err }, 400)
+    }
+    else {
+
+        if (challenge !== null || challenge !== {}) {
+            return ReS(res, { message: "Challenge created successfully", challenge: challenge, success: true }, 200)
+        }
+        else {
+            return ReE(res, { message: "Unable to retrieve challenges please try again.", success: false }, 400)
+        }
+    }
+}
+
+module.exports.createChallenge = createChallenge
 
 //   Get Challenges
 
-const getChallenges = async function(req,res) {
-    let err,challenges,options,query,page,limit
+const getChallenges = async function (req, res) {
+    let err, challenges, options, query, page, limit
 
     page = req.query.page ? req.query.page : 1
 
@@ -72,29 +73,29 @@ const getChallenges = async function(req,res) {
         }])
     }
 
-    query={active:true}
+    query = { active: true }
 
     try {
-        challenges= await Challenges.paginate(query, options).then(function (docs, err) {
+        challenges = await Challenges.paginate(query, options).then(function (docs, err) {
 
-            if(err) ReE(res,{ err },400)
-        
+            if (err) ReE(res, { err }, 400)
+
             return ReS(res, { message: "Challenges are", success: true, challenges: docs }, 200)
         })
 
     } catch (error) {
-        return ReE(res,{message:"Error on retrieving challenge",err,success:false},400)
+        return ReE(res, { message: "Error on retrieving challenge", err, success: false }, 400)
     }
-    
+
 }
 
 module.exports.getChallenges = getChallenges
 
 //   My Challenges
 
-const myChallenges = async function (req,res) {
-    
-    let err,challenges,options,query,page,limit,id
+const myChallenges = async function (req, res) {
+
+    let err, challenges, options, query, page, limit, id
 
     id = req.query.id
     page = req.query.page ? req.query.page : 1
@@ -117,18 +118,18 @@ const myChallenges = async function (req,res) {
         }])
     }
 
-    query={createdBy:id,active:true}
+    query = { createdBy: id, active: true }
 
     try {
-        challenges= await Challenges.paginate(query, options).then(function (docs, err) {
+        challenges = await Challenges.paginate(query, options).then(function (docs, err) {
 
-            if(err) ReE(res,{ message:"error",success:false,err },400)
-        
+            if (err) ReE(res, { message: "error", success: false, err }, 400)
+
             return ReS(res, { message: "My Challenges are", success: true, challenges: docs }, 200)
         })
 
     } catch (error) {
-        return ReE(res,{message:"Error on fetching my challenge",error},400)
+        return ReE(res, { message: "Error on fetching my challenge", error }, 400)
     }
 
 }
@@ -136,20 +137,20 @@ const myChallenges = async function (req,res) {
 module.exports.myChallenges = myChallenges
 //   Update Challenge
 
-const updateChallenge = async function(req,res) {
-    let err,challenge,id
+const updateChallenge = async function (req, res) {
+    let err, challenge, id
 
     id = req.query.id
-    [err,challenge] = await to(Challenges.findByIdAndUpdate(id,{$set:req.body},{new:true}))
+    [err, challenge] = await to(Challenges.findByIdAndUpdate(id, { $set: req.body }, { new: true }))
 
-    if(err){
+    if (err) {
 
-        return ReE(res,{err,success:false},400)
+        return ReE(res, { err, success: false }, 400)
     }
 
-    else{
+    else {
 
-        return ReS(res,{message:"Challenge updated",challenge:challenge,success:true},200)
+        return ReS(res, { message: "Challenge updated", challenge: challenge, success: true }, 200)
     }
 }
 
@@ -157,18 +158,18 @@ module.exports.updateChallenge = updateChallenge
 
 //   Delete Challenge
 
-const deleteChallenge = async function(req,res) {
-    let err,challenges,id,body
+const deleteChallenge = async function (req, res) {
+    let err, challenges, id, body
     id = req.query.id
     body = req.body
-    [err,challenges] = await to(Challenges.findByIdAndUpdate(id,{$set:{active:false}},{new:true}))
+    [err, challenges] = await to(Challenges.findByIdAndUpdate(id, { $set: { active: false } }, { new: true }))
 
-    if(err){
-        return ReE(res,{message:"Error on retrieving challenge",err,success:false},400)
+    if (err) {
+        return ReE(res, { message: "Error on retrieving challenge", err, success: false }, 400)
     }
 
-    else{
-        return ReS(res,{message:"Challenge deleted",challenges:challenges,success:true},200)
+    else {
+        return ReS(res, { message: "Challenge deleted", challenges: challenges, success: true }, 200)
     }
 }
 
@@ -176,34 +177,34 @@ module.exports.deleteChallenge = deleteChallenge
 
 // Join a challenge
 
-const joinChallenge = async function (req,res){
+const joinChallenge = async function (req, res) {
 
-    let userId,challengeId
+    let userId, challengeId
 
     userId = req.query.id
     challengeId = req.query.challenge
 
-    let err,user
+    let err, user
 
-    [err,user] = await to (Users.findById(userId))
+    [err, user] = await to(Users.findById(userId))
 
-    if(err){
-        return ReE(res,err,400)
+    if (err) {
+        return ReE(res, err, 400)
     }
 
-    else{
-        if(user !== null && user !== {} && user !== undefined){
-            let error,challenge
+    else {
+        if (user !== null && user !== {} && user !== undefined) {
+            let error, challenge
 
-            [error,challenge] = await to (Challenges.findById(challengeId))
+            [error, challenge] = await to(Challenges.findById(challengeId))
 
-            if(error){
-                return ReE(res,error,400)
+            if (error) {
+                return ReE(res, error, 400)
             }
 
-            else{
+            else {
 
-                if(challenge !== null && challenge !== {} && challenge.active === true){
+                if (challenge !== null && challenge !== {} && challenge.active === true) {
 
                     let isEnded = moment().diff(challenge.endAt, 'days')
 
@@ -238,20 +239,20 @@ const joinChallenge = async function (req,res){
                                 return ReE(res, { message: "You have already joined in this challenge", success: false }, 400)
                             }
                         }
-                  }
+                    }
 
-                  else{
-                    return ReE(res,{message:"Challenge is completed.",success:false},400)
-                  }
+                    else {
+                        return ReE(res, { message: "Challenge is completed.", success: false }, 400)
+                    }
                 }
 
-                else{
-                    return ReE(res,{message:"Invalid challenge.",success:false},400)
+                else {
+                    return ReE(res, { message: "Invalid challenge.", success: false }, 400)
                 }
             }
         }
-        else{
-            return ReE(res,{message:"Invalid user.",success:false},400)
+        else {
+            return ReE(res, { message: "Invalid user.", success: false }, 400)
         }
     }
 }
@@ -260,28 +261,33 @@ module.exports.joinChallenge = joinChallenge
 
 // Get joined challenges
 
-const joinedChallenges = async function (req,res){
-    let userId
+const joinedChallenges = async function (req, res) {
+    let userId, body
 
     userId = req.params.id
 
-    let err,user
+    body = req.body
 
-    [err,user] = await to (Users.findById(userId))
+    let err, user
 
-    if(err){
-        return ReE(res,err,400)
+    [err, user] = await to(Users.findById(userId))
+
+    if (err) {
+        return ReE(res, err, 400)
     }
 
     else {
         if (user !== null && user !== {} && user !== undefined) {
-            let error, joinedChallenges, options, page, limit, query
 
-            limit = req.query.limit
+            let error, options, page, limit, query
+
+            limit = req.query.limit || 10
+
+            page = req.query.page || 1
 
             options = {
-                page: page,
-                limit: limit,
+                page: 1,
+                limit: 50,
                 sort: {
                     createdAt: -1,
                 },
@@ -303,9 +309,11 @@ const joinedChallenges = async function (req,res){
                 // Expand the scores array into a stream of documents
                 { $unwind: '$competitors' },
 
-                { $match: {
-                    'competitors.userId': ObjectId(userId)
-                }},
+                {
+                    $match: {
+                        'competitors.userId': ObjectId(userId)
+                    }
+                },
                 // Sort in descending order
                 {
                     $sort: {
@@ -315,21 +323,60 @@ const joinedChallenges = async function (req,res){
             ]
 
             try {
-                Challenges.aggregatePaginate(Challenges.aggregate(query), options, function (err, results) {
+                Challenges.aggregatePaginate(Challenges.aggregate(query), options, async function (err, results) {
                     if (err) {
                         return ReE(res, error, 400)
                     }
                     else {
-                        let records
-                        // if(results.docs.length > 0){
-                        //     records = results.docs.filter(data => data.competitors.userId.toString() === userId)
-                        // }
-                        return ReS(res, { message: "Challenges you have joined", success: true, challenges: results }, 200)
+
+                        if (results.docs.length > 0) {
+                            results.docs.map(async (challenge) => {
+
+                                try {
+
+                                    await updateStreak(challenge, userId,body.token)
+
+                                } catch (error) {
+                                    return console.log("right uh...",{ error })
+                                    // return ReE(res, { error }, 400)
+                                }
+                            })
+                        }
+
+                        let options, query
+
+                        options = {
+                            page: page,
+                            limit: limit,
+                            sort: {
+                                createdAt: -1,
+                            },
+                            populate: ([{ path: "competitor", select: '_id fullName' },
+                                'challenge'])
+                        }
+                    
+                        query = { competitor: ObjectId(userId) }
+                    
+                        try {
+                            record = await ChallengeTracker.paginate(query, options).then(function (docs, err) {
+                    
+                                if (err) return ReE(res,{ err },400)
+                                
+                                return ReS(res, { message: "The Challenger's activities are", success: true,challenges:docs}, 200)
+                            })
+                    
+                        } catch (error) {
+                            return ReE(res, { message: "Error on retrieving challenger tracking list", error, success: false },400)
+                        }
+                        
+                        // return ReS(res, { message: "Challenges you have joined", success: true, challenges: results }, 200)
                     }
                 })
             } catch (error) {
                 return ReE(res, error, 400)
             }
+
+
         }
         else {
             return ReE(res, { message: "Invalid user..", success: false }, 400)
@@ -341,27 +388,221 @@ module.exports.joinedChallenges = joinedChallenges
 
 // Get a api info
 
-const getChallengeInfo = async function (req,res) {
-    let challenge,err
+const getChallengeInfo = async function (req, res) {
+    let challenge, err
 
 
-    [err,challenge] = await to(Challenges.findById(req.params.id))
+    [err, challenge] = await to(Challenges.findById(req.params.id))
 
-    if(err){
-        return ReE(res,err,400)
+    if (err) {
+        return ReE(res, err, 400)
     }
-    else{
+    else {
 
-        let error,leaders
+        let error, leaders
 
-        [error,leaders] = await to (ChallengeTracker.find({challenge:ObjectId(req.params.id)}).sort({streakNo:-1}).populate("competitor"))
+        [error, leaders] = await to(ChallengeTracker.find({ challenge: ObjectId(req.params.id) }).sort({ streakNo: -1 }).populate("competitor"))
 
-        if(error){
-            return ReE(res,{error},400)
+        if (error) {
+            return ReE(res, { error }, 400)
         }
 
-        return ReS(res,{message:"This challenge information is",challenge:challenge,leaders:leaders,success:true},200)
+        let winners = leaders.filter((leader)=>leader.status === 'completed')
+
+        return ReS(res, { message: "This challenge information is", challenge: challenge, leaders: leaders,winners:winners?winners:[], success: true }, 200)
     }
 }
 
 module.exports.getChallengeInfo = getChallengeInfo
+
+
+async function updateStreak(challenge, userId,token) {
+
+    let err, activity
+
+    [err, activity] = await to(ChallengeTracker.findOne({ competitor: ObjectId(userId), challenge: ObjectId(challenge._id.toString()) }).sort({ updatedAt: -1 }))
+
+    if (err) {
+        return ReE(res, { message: "Error on checking challenger is active", success: false, err }, 400)
+    }
+
+    else {
+        let err
+        let challengeTracker
+
+        if (activity && moment().isSame(activity.updatedAt, "day")) {
+
+
+            if (challenge.status !== 'completed' || moment().diff(challenge.endAt, 'days') < 0) {
+
+
+                let distance
+
+                try {
+                    distance = await getDistance(token,activity.updatedAt)
+                } catch (error) {
+                    console.log("Error on get distance...",error);
+                    throw Error({ error })
+                }
+
+                activity.totalKm += distance
+
+                [err, challengeTracker] = await to(activity.save())
+
+                if (err) {
+                    throw Error(err)
+                }
+
+                else {
+                    return
+                }
+            }
+            else {
+                throw Error({ message: "Challenge Completed Thank you for participating.", })
+            }
+
+        }
+
+        else {
+
+            let err, challengeTracker, body
+
+            let distance
+
+                try {
+                    distance = await getDistance(token,false)
+                } catch (error) {
+                    console.log("Checking error...",error);
+                    return ReE(res, { error }, 400)
+                }
+
+            body = {
+                "competitor": userId,
+                "challenge": challenge._id,
+                "startAt": moment().format(),
+                "endAt": challenge.endAt,
+                "totalkm": distance,
+                "streakNo": 0,
+            }
+
+            body.status = "in progress"
+
+            if (activity) {
+                body.streakNo = (challenge.totalKm <= distance) ? streakNo + 1 : body.streakNo
+                body.status = challenge.streakDays === body.streakNo ? "completed" : "inprogress"
+            }
+
+            [err, challengeTracker] = await to(ChallengeTracker.create(body))
+
+            if (err) {
+                throw Error({ message: "Error on tracking challenger" })
+            }
+            else {
+
+                if (challengeTracker !== null || challengeTracker !== {}) {
+                    return
+                }
+                else {
+                    throw Error({ message: "Unable to retrieve challenges please try again.", success: false })
+                }
+            }
+        }
+    }
+
+}
+
+async function getDistance(token,from) {
+
+    let data, url, startdate, endDate, totalSteps = 0
+
+    startdate = from ? moment(from).valueOf() : moment().subtract(1, "days").valueOf();
+    endDate = moment().valueOf()
+
+    url = 'https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate'
+
+    let body = {
+        "aggregateBy": [{
+            "dataSourceId": "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps"
+        }],
+        "bucketByTime": { "durationMillis": 86400000 }, // This is 24 hours    
+        "startTimeMillis": startdate,   // Start time    
+        "endTimeMillis": endDate  // End Time    
+    }
+
+    try {
+        data = await axios({
+            method: "POST",
+            headers: {
+                authorization: "Bearer " + token
+            },
+            "Content-Type": "application/json",
+            url: url,
+            data: body
+        })
+    } catch (error) {
+
+        throw new Error(error)
+
+        // return ReE(res,{error},400)
+    }
+    let result
+
+    result = await data
+
+    if (result.data.bucket.length > 0) {
+        result.data.bucket.map(data => {
+            if (data) {
+                if (data.dataset.length > 0) {
+                    data.dataset.map(item => {
+                        if (item.point.length > 0) {
+                            item.point.map(point => {
+                                if (point.value.length > 0) {
+                                    point.value.map(value => {
+                                        totalSteps += value.intVal
+                                    })
+                                }
+                            })
+                        }
+                    })
+                }
+            }
+        })
+    }
+
+    let km
+
+    km = (totalSteps / 2000) * 1.61
+
+    return km
+    // return ReS(res,{message:"Steps are..",success:true,totalSteps:totalSteps,km:km},200)
+
+}
+
+ async function getByChallenger (id,page,limit) {
+    let options, query
+
+    options = {
+        page: page,
+        limit: limit,
+        sort: {
+            createdAt: -1,
+        },
+        populate: ([{ path: "competitor", select: '_id fullName' },
+            'challenge'])
+    }
+
+    query = { competitor: ObjectId(id) }
+
+    try {
+        record = await ChallengeTracker.paginate(query, options).then(function (docs, err) {
+
+            if (err) throw Error({ err })
+            
+            return docs
+        })
+
+    } catch (error) {
+        throw Error( { message: "Error on retrieving challenger tracking list", error, success: false })
+    }
+
+}
