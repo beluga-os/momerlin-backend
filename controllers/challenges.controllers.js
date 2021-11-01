@@ -18,11 +18,11 @@ const createChallenge = async function (req, res) {
         streakDays: req.body.streakDays ? req.body.streakDays : "",
         totalKm: req.body.totalKm ? req.body.totalKm : "",
         createdBy: req.body.createdBy ? req.body.createdBy : "",
-        competitors: req.body.competitors ? req.body.competitors : [],
+        competitors: [{ userId: req.body.createdBy, joinedAt: moment().utc().format() }],
         commissionEnabled: req.body?.percentage > 0 ? true : false,
         percentage: req.body.percentage ? (req.body.percentage / 100) : 0,
-        startAt: moment().format(),
-        endAt: moment().add(req.body.streakDays, 'days').format(),
+        startAt: moment().utc().format(),
+        endAt: moment().utc().add(req.body.streakDays, 'days').format(),
         active: true,
         wage: req.body.wage ? req.body.wage : "",
         prize: parseInt(req.body.wage) * parseInt(req.body.totalCompetitors)
@@ -337,7 +337,7 @@ const joinedChallenges = async function (req, res) {
                                     await updateStreak(challenge, userId,body.token)
 
                                 } catch (error) {
-                                    return console.log("right uh...",{ error })
+                                    return console.log("Error on update streak...",{ error })
                                     // return ReE(res, { error }, 400)
                                 }
                             })
@@ -430,10 +430,10 @@ async function updateStreak(challenge, userId,token) {
         let err
         let challengeTracker
 
-        if (activity && moment().isSame(activity.updatedAt, "day")) {
+        if (activity && moment().utc().isSame(activity.updatedAt, "day")) {
 
 
-            if (challenge.status !== 'completed' || moment().diff(challenge.endAt, 'days') < 0) {
+            if (challenge.status !== 'completed' || moment().utc().diff(challenge.endAt, 'days') < 0) {
 
 
                 let distance
@@ -479,8 +479,8 @@ async function updateStreak(challenge, userId,token) {
             body = {
                 "competitor": userId,
                 "challenge": challenge._id,
-                "startAt": moment().format(),
-                "endAt": challenge.endAt,
+                "startAt": moment().utc().format(),
+                "endAt": moment(challenge.endAt).utc().format(),
                 "totalkm": distance,
                 "streakNo": 0,
             }
@@ -515,8 +515,8 @@ async function getDistance(token,from) {
 
     let data, url, startdate, endDate, totalSteps = 0
 
-    startdate = from ? moment(from).valueOf() : moment().subtract(1, "days").valueOf();
-    endDate = moment().valueOf()
+    startdate = from ? moment(from).utc().valueOf() : moment().utc().subtract(1, "days").valueOf();
+    endDate = moment().utc().valueOf()
 
     url = 'https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate'
 
@@ -570,6 +570,8 @@ async function getDistance(token,from) {
     }
 
     let km
+
+    console.log("Steps...",totalSteps,((totalSteps / 2000) * 1.61));
 
     km = (totalSteps / 2000) * 1.61
 
