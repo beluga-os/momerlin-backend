@@ -445,9 +445,9 @@ async function updateStreak(challenge, userId,token) {
                     throw Error({ error })
                 }
 
-                activity.totalKm += distance
-
-                [err, challengeTracker] = await to(activity.save())
+                let total_distance
+                total_distance = parseFloat(activity.totalkm) + distance;
+                [err, challengeTracker] = await to(ChallengeTracker.findOneAndUpdate({competitor: ObjectId(userId), challenge: ObjectId(challenge._id.toString()),updatedAt:new Date(activity.updatedAt)},{$set:{totalkm:total_distance}},{ new: true }));
 
                 if (err) {
                     throw Error(err)
@@ -473,7 +473,7 @@ async function updateStreak(challenge, userId,token) {
                     distance = await getDistance(token,false)
                 } catch (error) {
                     console.log("Checking error...",error);
-                    return ReE(res, { error }, 400)
+                    throw Error ({ error })
                 }
 
             body = {
@@ -482,7 +482,7 @@ async function updateStreak(challenge, userId,token) {
                 "startAt": moment().utc().format(),
                 "endAt": moment(challenge.endAt).utc().format(),
                 "totalkm": distance,
-                "streakNo": 0,
+                "streakNo": challenge.totalKm < distance ? 1 : 0,
             }
 
             body.status = "in progress"
@@ -515,8 +515,9 @@ async function getDistance(token,from) {
 
     let data, url, startdate, endDate, totalSteps = 0
 
-    startdate = from ? moment(from).utc().valueOf() : moment().utc().subtract(1, "days").valueOf();
-    endDate = moment().utc().valueOf()
+    startdate = moment().startOf('day').valueOf()
+    // startdate = from ? moment(from).utc().valueOf() : moment().utc().subtract(1, "days").valueOf();
+    endDate = moment().valueOf()
 
     url = 'https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate'
 
@@ -571,7 +572,7 @@ async function getDistance(token,from) {
 
     let km
 
-    console.log("Steps...",totalSteps,((totalSteps / 2000) * 1.61));
+    console.log("Steps...",moment(from).utc().format(),moment().utc().format(),startdate,totalSteps,((totalSteps / 2000) * 1.61));
 
     km = (totalSteps / 2000) * 1.61
 
