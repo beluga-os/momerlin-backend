@@ -647,7 +647,7 @@ router.get('/users',PlaidController.createLinkToken) // Get users
 
 router.get('/user/get',PlaidController.getUser) // Get a particular user
 
-router.put('/user/update',PlaidController.updateUser) // Api to update a user
+router.put('/user/:id',PlaidController.updateUser) // Api to update a user
 
 router.delete('/user/delete',PlaidController.deleteUser) // Api to delete a user
 

@@ -394,10 +394,9 @@ module.exports. getUser = getUser
 //   Update Challenge
 
 const updateUser = async function(req,res) {
-    let err,user,id
-
-    id = req.query.id
-    [err,user] = await to(Users.findByIdAndUpdate(id,{$set:req.body},{new:true}))
+    let err,user
+    
+    [err,user] = await to(Users.findByIdAndUpdate(req.params.id,{$set:req.body},{new:true}))
 
     if(err){
 

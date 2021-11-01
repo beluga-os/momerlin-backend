@@ -19,7 +19,7 @@ const UserSchema =new mongoose.Schema({
     imageUrl:String,
     active:{
         type:Boolean,
-        default:false
+        default:true
     },
     googleFitEnabled:{
         type: Boolean,
