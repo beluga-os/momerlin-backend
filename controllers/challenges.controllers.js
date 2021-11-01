@@ -515,8 +515,7 @@ async function getDistance(token,from) {
 
     let data, url, startdate, endDate, totalSteps = 0
 
-    startdate = moment().startOf('day').valueOf()
-    // startdate = from ? moment(from).utc().valueOf() : moment().utc().subtract(1, "days").valueOf();
+    startdate = from ? moment(from).valueOf() : moment().subtract(1, "days").valueOf();
     endDate = moment().valueOf()
 
     url = 'https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate'
