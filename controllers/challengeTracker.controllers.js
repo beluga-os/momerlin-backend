@@ -297,7 +297,7 @@ const getLeaders = async function (req, res) {
 
     let err, leaders
 
-    [err, leaders] = await to(ChallengeTracker.find({ status: 'completed' }).limit(5).sort({ streakNo: -1 })
+    [err, leaders] = await to(ChallengeTracker.find({}).limit(5).sort({ streakNo: -1,totalkm:-1 })
         .populate([{ path: "competitor", select: '_id fullName' },
             'challenge']))
 
@@ -310,6 +310,25 @@ const getLeaders = async function (req, res) {
     }
 }
 module.exports.getLeaders = getLeaders
+
+
+const getAllWinners = async function (req, res) {
+
+    let err, leaders
+
+    [err, leaders] = await to(ChallengeTracker.find({ status: 'completed' }).limit(5).sort({ streakNo: -1,totalkm:-1 })
+        .populate([{ path: "competitor", select: '_id fullName' },
+            'challenge']))
+
+    if (err) {
+        return ReE(res, { err }, 400)
+    }
+
+    else {
+        return ReS(res, { message: "The Leaderboard details are", success: true, leaders: leaders }, 200)
+    }
+}
+module.exports.getAllWinners = getAllWinners
 
 const getChallengeWinner = async function (req, res) {
     let winners, err

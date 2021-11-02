@@ -401,7 +401,7 @@ const getChallengeInfo = async function (req, res) {
 
         let error, leaders
 
-        [error, leaders] = await to(ChallengeTracker.find({ challenge: ObjectId(req.params.id) }).sort({ streakNo: -1 }).populate("competitor"))
+        [error, leaders] = await to(ChallengeTracker.find({ challenge: ObjectId(req.params.id) }).sort({ streakNo: -1,totalkm:-1 }).populate("competitor"))
 
         if (error) {
             return ReE(res, { error }, 400)
@@ -488,7 +488,7 @@ async function updateStreak(challenge, userId,token) {
             body.status = "in progress"
 
             if (activity) {
-                body.streakNo = (challenge.totalKm <= distance) ? streakNo + 1 : body.streakNo
+                body.streakNo = (challenge.totalKm <= distance) ? activity.streakNo + 1 : body.streakNo
                 body.status = challenge.streakDays === body.streakNo ? "completed" : "inprogress"
             }
 
@@ -571,7 +571,7 @@ async function getDistance(token,from) {
 
     let km
 
-    console.log("Steps...",moment(from).utc().format(),moment().utc().format(),startdate,totalSteps,((totalSteps / 2000) * 1.61));
+    console.log("Steps...",totalSteps,((totalSteps / 2000) * 1.61));
 
     km = (totalSteps / 2000) * 1.61
 
