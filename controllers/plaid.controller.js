@@ -329,7 +329,7 @@ const getUsers =  async function(req,res){
       return ReE(res, { err }, 400)
   }
   else {
-      if (user.length > 0) {
+      if (users.length > 0) {
           return ReS(res, { message: "Users are:", success: true, users: users }, 200)
       }
       else {
@@ -406,7 +406,7 @@ const checkUserName = async function (req,res) {
       return ReE(res,err,400)
   }
   else{
-      return ReS(res,{message:"This user information is",available:user.length > 0,success:true},200)
+      return ReS(res,{message:"User availability is",available:user.length > 0,success:true},200)
   }
 }
 

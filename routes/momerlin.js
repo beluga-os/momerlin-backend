@@ -643,7 +643,7 @@ router.get('/payment',PlaidController.getPayment) // Get payments list
 
 router.post('/user',PlaidController.createUser) // Create user
 
-router.get('/users',PlaidController.createLinkToken) // Get users
+router.get('/users',PlaidController.getUsers) // Get users
 
 router.get('/user/get',PlaidController.getUser) // Get a particular user
 
