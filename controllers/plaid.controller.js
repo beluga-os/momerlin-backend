@@ -354,6 +354,10 @@ const createUser = async function (req, res) {
     return ReE(res, { message: 'Please enter ethAddress', "success": false, user: '' }, 400)
   }
 
+  if (typeof reqUser.fullName === 'undefined' || reqUser.fullName === '') {
+    return ReE(res, { message: 'Please enter nickname', "success": false, user: '' }, 400)
+  }
+
   else {
 
     [err, user] = await to(Users.create(reqUser));
@@ -390,6 +394,23 @@ const getUser = async function (req,res) {
 }
 
 module.exports. getUser = getUser 
+
+// Check available nickName
+
+const checkUserName = async function (req,res) {
+  let user,err
+
+  [err,user] = await to(Users.find({ fullName: {$regex : "^" + req.params.name}}))
+
+  if(err){
+      return ReE(res,err,400)
+  }
+  else{
+      return ReS(res,{message:"This user information is",available:user.length > 0,success:true},200)
+  }
+}
+
+module.exports. checkUserName = checkUserName
 
 //   Update Challenge
 

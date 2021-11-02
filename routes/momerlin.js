@@ -647,6 +647,8 @@ router.get('/users',PlaidController.createLinkToken) // Get users
 
 router.get('/user/get',PlaidController.getUser) // Get a particular user
 
+router.get('/user/checkName/:name', PlaidController.checkUserName) // Api to check available user Name
+
 router.put('/user/:id',PlaidController.updateUser) // Api to update a user
 
 router.delete('/user/delete',PlaidController.deleteUser) // Api to delete a user
