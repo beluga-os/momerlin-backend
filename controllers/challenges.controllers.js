@@ -407,9 +407,21 @@ const getChallengeInfo = async function (req, res) {
             return ReE(res, { error }, 400)
         }
 
+        let users = []
+        leaders.map((leader)=>{
+            if(users.length < 1){
+                return users.push(leader)
+            }
+            else{
+                if(users.filter(user=>user.competitor._id === leader.competitor._id).length < 1){
+                    return users.push(leader)
+                }
+            }
+        })
+
         let winners = leaders.filter((leader)=>leader.status === 'completed')
 
-        return ReS(res, { message: "This challenge information is", challenge: challenge,winners:winners?winners:[], leaders: leaders, success: true }, 200)
+        return ReS(res, { message: "This challenge information is", challenge: challenge,winners:winners?winners:[], leaders: users, success: true }, 200)
     }
 }
 
