@@ -22,6 +22,10 @@ const ChallengeTrackerSchema =new mongoose.Schema({
     status:{
         type:String,
         default:"in progress"
+    },
+    prize:{
+        type:Number,
+        default:0
     }
 }, {timestamps: true});
 

@@ -401,15 +401,15 @@ const getChallengeInfo = async function (req, res) {
 
         let error, leaders
 
-        [error, leaders] = await to(ChallengeTracker.find({ challenge: ObjectId(req.params.id) }).sort({ streakNo: -1,totalkm:-1 }).populate("competitor"))
+        [error, leaders] = await to(ChallengeTracker.find({ challenge: ObjectId(req.params.id) }).sort({ prize:-1,streakNo: -1,totalkm:-1 }).populate("competitor"))
 
         if (error) {
             return ReE(res, { error }, 400)
         }
 
-        let winners = leaders.slice(0,4)
+        let winners = leaders.filter((leader)=>leader.status === 'completed')
 
-        return ReS(res, { message: "This challenge information is", challenge: challenge, leaders: leaders,winners:winners?winners:[], success: true }, 200)
+        return ReS(res, { message: "This challenge information is", challenge: challenge,winners:winners?winners:[], leaders: leaders, success: true }, 200)
     }
 }
 
