@@ -316,7 +316,7 @@ const getAllWinners = async function (req, res) {
 
     let err, leaders
 
-    [err, leaders] = await to(ChallengeTracker.find({ status: 'completed' }).limit(5).sort({ streakNo: -1,totalkm:-1 })
+    [err, leaders] = await to(ChallengeTracker.find({ status: 'completed' }).limit(10).sort({ streakNo: -1,totalkm:-1 })
         .populate([{ path: "competitor", select: '_id fullName' },
             'challenge']))
 

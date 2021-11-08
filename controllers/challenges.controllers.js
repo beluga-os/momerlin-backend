@@ -407,7 +407,7 @@ const getChallengeInfo = async function (req, res) {
             return ReE(res, { error }, 400)
         }
 
-        let winners = leaders.filter((leader)=>leader.status === 'completed')
+        let winners = leaders.slice(0,4)
 
         return ReS(res, { message: "This challenge information is", challenge: challenge, leaders: leaders,winners:winners?winners:[], success: true }, 200)
     }

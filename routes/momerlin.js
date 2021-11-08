@@ -674,8 +674,6 @@ router.put('/challenge/joined/:id',ChallengesController.joinedChallenges) // Api
 
 // ********** Challenge tracker API's ************ //
 
-router.post('/track/challenge',ChallengeTrackerController.trackChallenger) // Api to track challenge
-
 router.get('/track/challenger',ChallengeTrackerController.getByChallenger) // Api to get reocrd of a challenger
 
 router.get('/track/challenge/get',ChallengeTrackerController.getByChallenges) // Api to get rocord of a challenge
@@ -686,8 +684,6 @@ router.get('/track/challenge/:id', ChallengeTrackerController.getChallenge) // A
 
 router.get('/leaderboard', ChallengeTrackerController.getLeaders) // Api to get leade board details
 
-router.get('/challenge/winners/:id',ChallengeTrackerController.calculateWinner) // Api to get Challenge winners
-
-// router.get('/user/data',ChallengeTrackerController.getUserData)
+router.get('/challenges/winners',ChallengeTrackerController.getAllWinners) // Api to get recent winners
 
 module.exports = router;

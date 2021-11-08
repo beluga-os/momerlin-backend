@@ -62,27 +62,9 @@ app.use('/api', momerlin);
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 
 
-
-const https = require('https')
-const fs = require('fs')
-if (fs.existsSync('/etc/letsencrypt/live/api.momerlin.com//privkey.pem')) {
-    server = https.createServer({
-        key: fs.readFileSync('/etc/letsencrypt/live/api.momerlin.com//privkey.pem', 'utf8'),
-        cert: fs.readFileSync('/etc/letsencrypt/live/api.momerlin.com//fullchain.pem', 'utf8')
-    }, app).listen(PORT, () => {
-        console.log('Listening... ', PORT)
-    })
-}
-else {
-    app.listen(PORT, () => {
-        console.log('Server started on port', PORT);
-    });
-}
-
-
-// app.listen(PORT, () => {
-//     console.log('Server started on port',PORT);
-// });
+app.listen(PORT, () => {
+    console.log('Server started on port',PORT);
+});
 
 
 // pe = require('parse-error');//parses error so you can read error message and handle them accordingly
