@@ -314,7 +314,7 @@ const getTransactions = async function (request, response, next) {
 
     let err, user
 
-    [err, user] = await to(Users.findOne({ address: address }))
+    [err, user] = await to(Users.findOne({ ethAddress: address }))
 
     if (err) {
       return ReE(res, { err }, 400)
