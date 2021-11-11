@@ -1,52 +1,60 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const jwt  = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 const validate = require('mongoose-validator')
-const {to,TE} = require('../services/global.services')
+const { to, TE } = require('../services/global.services')
 const mongoosePaginate = require('mongoose-paginate-v2')
 const Schema = mongoose.Schema;
 
-const UserSchema =new mongoose.Schema({
-    fullName:String,
-    btcAddress:String,
-    ethAddress:String,
-    tronAddress:String,
-    seedEncrypted:String,
-    password:{
-        type:String,
-        default:''
+const UserSchema = new mongoose.Schema({
+    fullName: String,
+    btcAddress: String,
+    ethAddress: String,
+    tronAddress: String,
+    seedEncrypted: String,
+    eth: {
+        type: String,
+        default: '0'
     },
-    imageUrl:String,
-    active:{
-        type:Boolean,
-        default:true
+    gwei: {
+        type: String,
+        default: '0'
     },
-    googleFitEnabled:{
+    password: {
+        type: String,
+        default: ''
+    },
+    imageUrl: String,
+    active: {
+        type: Boolean,
+        default: true
+    },
+    googleFitEnabled: {
         type: Boolean,
         default: false
     },
-    healthKitEnabled:{
+    healthKitEnabled: {
         type: Boolean,
         default: false
     }
-}, {timestamps: true});
+}, { timestamps: true });
 
 
-UserSchema.plugin(mongoosePaginate); 
+UserSchema.plugin(mongoosePaginate);
 
-UserSchema.pre('save', async function(next){
+UserSchema.pre('save', async function (next) {
 
-    if(this.isModified('password') || this.isNew){
+    if (this.isModified('password') || this.isNew) {
 
         let err, salt, hash;
         [err, salt] = await to(bcrypt.genSalt(10));
-        if(err) TE(err.message, true);
+        if (err) TE(err.message, true);
 
         [err, hash] = await to(bcrypt.hash(this.password, salt));
-        if(err) TE(err.message, true);
+        if (err) TE(err.message, true);
         this.password = hash;
 
-    } else{
+    } else {
         return next();
     }
 })
