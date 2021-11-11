@@ -322,8 +322,8 @@ const getTransactions = async function (request, response, next) {
 
     else {
       if (user) {
-        user.gwei = new BigNumber(user.gwei).plus(new BigNumber(gwei))
-        user.eth = new BigNumber(user.eth).plus(new BigNumber(eth))
+        user.gwei = new BigNumber(user.gwei).plus(new BigNumber(gwei)).toString(10)
+        user.eth = new BigNumber(user.eth).plus(new BigNumber(eth)).toString(10)
 
         let err, updateUser
 
