@@ -236,6 +236,8 @@ const getTransactions = async function (request, response, next) {
     end_date: endDate
   };
 
+  let gwei = 0, eth = 0
+
   console.log("Checking address...", address);
   try {
     let result
@@ -255,8 +257,6 @@ const getTransactions = async function (request, response, next) {
     }
     // Preparing rows to insert into influxDB
     let rows = []
-
-    let gwei = 0, eth = 0
 
     transactions.map((t) => {
       let sat = (Math.ceil(t.amount) - t.amount)
@@ -330,14 +330,14 @@ const getTransactions = async function (request, response, next) {
         [err, updateUser] = await to(user.save())
 
         if (err) {
-          return ReE(res, { err }, 400)
+          return ReE(response, { err }, 400)
         }
 
-        return ReS(res, { message: "Points added.", success: true, user: user }, 200)
+        return ReS(response, { message: "Points added.", success: true, user: user }, 200)
       }
 
       else {
-        return ReE(res, { message: "Could not find the user.", success: false }, 400)
+        return ReE(response, { message: "Could not find the user.", success: false }, 400)
       }
 
     }
