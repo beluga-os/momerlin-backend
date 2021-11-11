@@ -317,7 +317,7 @@ const getTransactions = async function (request, response, next) {
     [err, user] = await to(Users.findOne({ ethAddress: address }))
 
     if (err) {
-      return ReE(res, { err }, 400)
+      return ReE(response, { err }, 400)
     }
 
     else {
@@ -509,7 +509,7 @@ const getMomerlinTransactions = async function (request, response) {
       offset ${offset}`
 
     await influxClient.query(query).then(result => {
-      return ReS(response, { message: "Transactions list is", success: true, gwei: gwei.toString(10), eth: eth.toString(10), transactions: result }, 200)
+      return ReS(response, { message: "Transactions list is", success: true, transactions: result }, 200)
     }).catch(err => {
       response.status(500).send(err.stack)
     })
