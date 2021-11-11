@@ -389,8 +389,7 @@ module.exports.joinedChallenges = joinedChallenges
 // Get a api info
 
 const getChallengeInfo = async function (req, res) {
-    let challenge, err
-
+    let challenge, err, isEnded
 
     [err, challenge] = await to(Challenges.findById(req.params.id))
 
@@ -401,7 +400,7 @@ const getChallengeInfo = async function (req, res) {
 
         let error, leaders
 
-        [error, leaders] = await to(ChallengeTracker.find({ challenge: ObjectId(req.params.id) }).sort({ prize:-1,streakNo: -1,totalkm:-1 }).populate("competitor"))
+        [error, leaders] = await to(ChallengeTracker.find({ challenge: ObjectId(req.params.id) }).sort({ prize:-1,updatedAt:-1,streakNo: -1,totalkm:-1 }).populate("competitor"))
 
         if (error) {
             return ReE(res, { error }, 400)
@@ -419,9 +418,11 @@ const getChallengeInfo = async function (req, res) {
             }
         })
 
+        isEnded = moment().utc().diff(challenge.endAt, 'days') < 0
+
         let winners = leaders.filter((leader)=>leader.status === 'completed')
 
-        return ReS(res, { message: "This challenge information is", challenge: challenge,winners:winners?winners:[], leaders: users, success: true }, 200)
+        return ReS(res, { message: "This challenge information is", challenge: challenge,winners:isEnded ? winners:[], leaders: users, success: true }, 200)
     }
 }
 

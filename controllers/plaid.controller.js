@@ -245,7 +245,7 @@ const getTransactions =  async function (request, response, next) {
       let transactions
       transactions = result.data.transactions;
   
-      let recent
+      let recent = []
       try {
         recent = await influxClient.query(`select * from transactions
         where address = ${Influx.escape.stringLit(request.query.address)}
