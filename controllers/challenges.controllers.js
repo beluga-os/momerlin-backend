@@ -334,7 +334,7 @@ const joinedChallenges = async function (req, res) {
 
                                 try {
 
-                                    await updateStreak(challenge, userId,body.token)
+                                    await updateStreak(challenge, userId,body.token,body.distance?body.distance:false)
 
                                 } catch (error) {
                                     return console.log("Error on update streak...",{ error })
@@ -429,10 +429,11 @@ const getChallengeInfo = async function (req, res) {
 module.exports.getChallengeInfo = getChallengeInfo
 
 
-async function updateStreak(challenge, userId,token) {
+async function updateStreak(challenge, userId,token,km) {
 
     let err, activity
 
+                // return console.log("checking token....",token,typeof token !== 'undefined');
     [err, activity] = await to(ChallengeTracker.findOne({ competitor: ObjectId(userId), challenge: ObjectId(challenge._id.toString()) }).sort({ updatedAt: -1 }))
 
     if (err) {
@@ -451,24 +452,38 @@ async function updateStreak(challenge, userId,token) {
 
                 let distance
 
-                try {
-                    distance = await getDistance(token,activity.updatedAt)
-                } catch (error) {
-                    console.log("Error on get distance...",error);
-                    throw Error({ error })
+
+                if (typeof token !== 'undefined') {
+                    try {
+                        distance = await getDistance(token, activity.updatedAt)
+                    } catch (error) {
+                        console.log("Error on get distance...", error);
+                        throw Error({ error })
+                    }
                 }
 
-                let total_distance
-                total_distance = parseFloat(activity.totalkm) + distance;
-                [err, challengeTracker] = await to(ChallengeTracker.findOneAndUpdate({competitor: ObjectId(userId), challenge: ObjectId(challenge._id.toString()),updatedAt:new Date(activity.updatedAt)},{$set:{totalkm:total_distance}},{ new: true }));
-
-                if (err) {
-                    throw Error(err)
+                else{
+                    distance = km
                 }
 
+                if (distance) {
+
+                    let total_distance
+                    total_distance = typeof token !== 'undefined' ? parseFloat(activity.totalkm) + distance : distance;
+                    [err, challengeTracker] = await to(ChallengeTracker.findOneAndUpdate({ competitor: ObjectId(userId), challenge: ObjectId(challenge._id.toString()), updatedAt: new Date(activity.updatedAt) }, { $set: { totalkm: total_distance } }, { new: true }));
+
+                    if (err) {
+                        throw Error(err)
+                    }
+
+                    else {
+                        return
+                    }
+                }
                 else {
                     return
                 }
+
             }
             else {
                 throw Error({ message: "Challenge Completed Thank you for participating.", })
@@ -482,12 +497,19 @@ async function updateStreak(challenge, userId,token) {
 
             let distance
 
+            if (typeof token !== 'undefined') {
                 try {
-                    distance = await getDistance(token,false)
+                    distance = await getDistance(token, false)
                 } catch (error) {
-                    console.log("Checking error...",error);
-                    throw Error ({ error })
+                    console.log("Checking error...", error);
+                    throw Error({ error })
                 }
+            }
+
+            else {
+
+                distance = km
+            }
 
             body = {
                 "competitor": userId,
@@ -500,26 +522,32 @@ async function updateStreak(challenge, userId,token) {
 
             body.status = "in progress"
 
-            if (activity) {
-                body.streakNo = (challenge.totalKm <= distance) ? activity.streakNo + 1 : body.streakNo
-                body.status = challenge.streakDays === body.streakNo ? "completed" : "inprogress"
-            }
+            if (distance) {
+                if (activity) {
+                    body.streakNo = (challenge.totalKm <= distance) ? activity.streakNo + 1 : body.streakNo
+                    body.status = challenge.streakDays === body.streakNo ? "completed" : "inprogress"
+                }
 
-            [err, challengeTracker] = await to(ChallengeTracker.create(body))
+                [err, challengeTracker] = await to(ChallengeTracker.create(body))
 
-            if (err) {
-                throw Error({ message: "Error on tracking challenger" })
-            }
-            else {
-
-                if (challengeTracker !== null || challengeTracker !== {}) {
-                    return
+                if (err) {
+                    throw Error({ message: "Error on tracking challenger" })
                 }
                 else {
-                    throw Error({ message: "Unable to retrieve challenges please try again.", success: false })
+
+                    if (challengeTracker !== null || challengeTracker !== {}) {
+                        return
+                    }
+                    else {
+                        throw Error({ message: "Unable to retrieve challenges please try again.", success: false })
+                    }
                 }
             }
+            else {
+                return
+            }
         }
+           
     }
 
 }
