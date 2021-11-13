@@ -5,6 +5,7 @@ const ChallengeTracker = require("../models/challengeTracker.model")
 const Users = require("../models/user.model")
 const { ReE, ReS, to } = require("../services/global.services")
 const axios = require('axios');
+const BigNumber = require('bignumber.js')
 
 const ObjectId = require('mongoose').Types.ObjectId;
 // Create challange
@@ -193,7 +194,7 @@ const joinChallenge = async function (req, res) {
     }
 
     else {
-        if (user !== null && user !== {} && user !== undefined) {
+        if (user !== null && user !== {} && typeof user !== undefined) {
             let error, challenge
 
             [error, challenge] = await to(Challenges.findById(challengeId))
@@ -207,6 +208,8 @@ const joinChallenge = async function (req, res) {
                 if (challenge !== null && challenge !== {} && challenge.active === true) {
 
                     let isEnded = moment().diff(challenge.endAt, 'days')
+
+                    if(user.gwei > challenge.wage){
 
                     if (isEnded <= 0) {
                         if (challenge.competitors.length > challenge.totalCompetitors) {
@@ -232,6 +235,13 @@ const joinChallenge = async function (req, res) {
                                     return ReE(res, error, 400)
                                 }
 
+                                user.gwei = new BigNumber(String(parseInt(challenge.wage))).times(new BigNumber('1000000000'), 10).minus(new BigNumber(user.gwei)).toString(10)
+                                
+                                try {
+                                    await user.save()
+                                } catch (error) {
+                                    return ReE(res, error, 400)
+                                }
                                 return ReS(res, { message: "You have joined this challenge", success: true, challenge: challenge }, 200)
                             }
 
@@ -244,6 +254,12 @@ const joinChallenge = async function (req, res) {
                     else {
                         return ReE(res, { message: "Challenge is completed.", success: false }, 400)
                     }
+                    }
+
+                    else{
+                        return ReE(res, { message: "You don't have enough gwei to join challenge.", success: false }, 400)
+                    }
+
                 }
 
                 else {
