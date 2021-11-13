@@ -273,7 +273,7 @@ const joinChallenge = async function (req, res) {
                                     return ReE(res, error, 400)
                                 }
 
-                                user.gwei = new BigNumber(String(parseInt(challenge.wage))).minus(new BigNumber(user.gwei)).toString(10)
+                                user.gwei = new BigNumber(user.gwei).minus(new BigNumber(challenge.wage)).toString(10)
 
                                 user.eth = new BigNumber(new BigNumber(String(parseInt(user.gwei)))).div(new BigNumber('1000000000000000000'), 10).toString(10)
 
