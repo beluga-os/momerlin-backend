@@ -29,22 +29,60 @@ const createChallenge = async function (req, res) {
         prize: parseInt(req.body.wage) * parseInt(req.body.totalCompetitors)
     }
 
-    let err, challenge
+    let err, challenge, user
 
-    [err, challenge] = await to(Challenges.create(body))
+    [err,user] = await to(Users.findById(req.body.createdBy))
 
-    if (err) {
-        return ReE(res, { message: "Error on create challenge", success: false, err }, 400)
+    if(err){
+
     }
-    else {
 
-        if (challenge !== null || challenge !== {}) {
-            return ReS(res, { message: "Challenge created successfully", challenge: challenge, success: true }, 200)
+    else{
+
+        if(user){
+
+            let gwei = new BigNumber(body.wage, 10).toString(10)
+
+            if(Number(user.gwei) > Number(gwei)){
+
+                [err, challenge] = await to(Challenges.create(body))
+
+                if (err) {
+                    return ReE(res, { message: "Error on create challenge", success: false, err }, 400)
+                }
+                else {
+
+                    if (challenge !== null || challenge !== {}) {
+
+                        user.gwei = new BigNumber(user.gwei).minus(new BigNumber(gwei)).toString(10)
+
+                        user.eth = new BigNumber(new BigNumber(String(parseInt(user.gwei)))).div(new BigNumber('1000000000000000000'), 10).toString(10)
+
+                        try {
+                            await user.save()
+                            return ReS(res, { message: "Challenge created successfully", challenge: challenge, success: true }, 200)
+                        } catch (error) {
+                            return ReE(res, error, 400)
+                        }
+                    }
+                    else {
+                        return ReE(res, { message: "Unable to retrieve challenges please try again.", success: false }, 400)
+                    }
+                }
+            }
+
+            else{
+                return ReE(res,{message:"You do not have enough gwei to create this challenge",success:false},400)
+            }
+
         }
-        else {
-            return ReE(res, { message: "Unable to retrieve challenges please try again.", success: false }, 400)
+
+        else{
+            return ReE(res,{message:"Invalid user",success:false},400)
         }
+        
     }
+    
 }
 
 module.exports.createChallenge = createChallenge
@@ -236,7 +274,9 @@ const joinChallenge = async function (req, res) {
                                 }
 
                                 user.gwei = new BigNumber(String(parseInt(challenge.wage))).times(new BigNumber('1000000000'), 10).minus(new BigNumber(user.gwei)).toString(10)
-                                
+
+                                user.eth = new BigNumber(new BigNumber(String(parseInt(user.gwei)))).div(new BigNumber('1000000000000000000'), 10).plus(new BigNumber(eth)).toString(10)
+
                                 try {
                                     await user.save()
                                 } catch (error) {
