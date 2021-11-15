@@ -263,9 +263,9 @@ const getTransactions = async function (request, response, next) {
 
       let time = moment(t.date).utc().valueOf()
 
-      gwei = new BigNumber(String(parseInt(sat * 100))).times(new BigNumber('1000000000'), 10).plus(new BigNumber(gwei)).toString(10)
+      gwei = new BigNumber(String(parseInt(sat * 100))).plus(new BigNumber(gwei)).toString()
 
-      eth = new BigNumber(new BigNumber(String(parseInt(sat * 100))).times(new BigNumber('1000000000'), 10)).div(new BigNumber('1000000000000000000'), 10).plus(new BigNumber(eth)).toString(10)
+      // eth = new BigNumber(new BigNumber(String(parseInt(sat * 100)))).div(new BigNumber('1000000000000000000'), 10).plus(new BigNumber(eth)).toString(10)
 
       if (t.merchant_name !== null) {
         recent.length < 1 ? rows.push({
@@ -322,8 +322,8 @@ const getTransactions = async function (request, response, next) {
 
     else {
       if (user) {
-        user.gwei = new BigNumber(user.gwei).plus(new BigNumber(gwei)).toString(10)
-        user.eth = new BigNumber(user.eth).plus(new BigNumber(eth)).toString(10)
+        user.gwei = new BigNumber(user.gwei).plus(new BigNumber(gwei)).toString()
+        // user.eth = new BigNumber(user.eth).plus(new BigNumber(eth)).toString(10)
 
         let err, updateUser
 

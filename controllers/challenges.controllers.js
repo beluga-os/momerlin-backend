@@ -41,7 +41,7 @@ const createChallenge = async function (req, res) {
 
         if(user){
 
-            let gwei = new BigNumber(body.wage, 10).toString(10)
+            let gwei = new BigNumber(body.wage).toString()
 
             if(Number(user.gwei) > Number(gwei)){
 
@@ -54,9 +54,9 @@ const createChallenge = async function (req, res) {
 
                     if (challenge !== null || challenge !== {}) {
 
-                        user.gwei = new BigNumber(user.gwei).minus(new BigNumber(gwei)).toString(10)
+                        user.gwei = new BigNumber(user.gwei).minus(new BigNumber(gwei)).toString()
 
-                        user.eth = new BigNumber(new BigNumber(String(parseInt(user.gwei)))).div(new BigNumber('1000000000000000000'), 10).toString(10)
+                        // user.eth = new BigNumber(new BigNumber(String(parseInt(user.gwei)))).div(new BigNumber('1000000000000000000'), 10).toString(10)
 
                         try {
                             await user.save()
@@ -273,9 +273,9 @@ const joinChallenge = async function (req, res) {
                                     return ReE(res, error, 400)
                                 }
 
-                                user.gwei = new BigNumber(user.gwei).minus(new BigNumber(challenge.wage)).toString(10)
+                                user.gwei = new BigNumber(user.gwei).minus(new BigNumber(challenge.wage)).toString()
 
-                                user.eth = new BigNumber(new BigNumber(String(parseInt(user.gwei)))).div(new BigNumber('1000000000000000000'), 10).toString(10)
+                                // user.eth = new BigNumber(new BigNumber(String(parseInt(user.gwei)))).div(new BigNumber('1000000000000000000'), 10).toString(10)
 
                                 try {
                                     await user.save()
