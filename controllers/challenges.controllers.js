@@ -247,53 +247,53 @@ const joinChallenge = async function (req, res) {
 
                     let isEnded = moment().diff(challenge.endAt, 'days')
 
-                    if(user.gwei > challenge.wage){
+                    if (Number(user.gwei) > Number(challenge.wage)) {
 
-                    if (isEnded <= 0) {
-                        if (challenge.competitors.length > challenge.totalCompetitors) {
-                            return ReE(res, { message: "Total members limit reached please try another challenge.", success: false }, 400)
+                        if (isEnded <= 0) {
+                            if (challenge.competitors.length > challenge.totalCompetitors) {
+                                return ReE(res, { message: "Total members limit reached please try another challenge.", success: false }, 400)
+                            }
+                            else {
+
+                                let hasJoined
+
+                                if (challenge.competitors.length > 0) {
+                                    hasJoined = challenge.competitors.filter(data => data.userId.toString() === userId)
+                                }
+
+                                else {
+                                    hasJoined = []
+                                }
+
+                                if (hasJoined.length < 1) {
+                                    challenge.competitors.push({ userId: userId, joinedAt: moment().format() })
+                                    try {
+                                        await challenge.save()
+                                    } catch (error) {
+                                        return ReE(res, error, 400)
+                                    }
+
+                                    user.gwei = new BigNumber(user.gwei).minus(new BigNumber(challenge.wage)).toString()
+
+                                    // user.eth = new BigNumber(new BigNumber(String(parseInt(user.gwei)))).div(new BigNumber('1000000000000000000'), 10).toString(10)
+
+                                    try {
+                                        await user.save()
+                                    } catch (error) {
+                                        return ReE(res, error, 400)
+                                    }
+                                    return ReS(res, { message: "You have joined this challenge", success: true, challenge: challenge }, 200)
+                                }
+
+                                else {
+                                    return ReE(res, { message: "You have already joined in this challenge", success: false }, 400)
+                                }
+                            }
                         }
+
                         else {
-
-                            let hasJoined
-
-                            if (challenge.competitors.length > 0) {
-                                hasJoined = challenge.competitors.filter(data => data.userId.toString() === userId)
-                            }
-
-                            else {
-                                hasJoined = []
-                            }
-
-                            if (hasJoined.length < 1) {
-                                challenge.competitors.push({ userId: userId, joinedAt: moment().format() })
-                                try {
-                                    await challenge.save()
-                                } catch (error) {
-                                    return ReE(res, error, 400)
-                                }
-
-                                user.gwei = new BigNumber(user.gwei).minus(new BigNumber(challenge.wage)).toString()
-
-                                // user.eth = new BigNumber(new BigNumber(String(parseInt(user.gwei)))).div(new BigNumber('1000000000000000000'), 10).toString(10)
-
-                                try {
-                                    await user.save()
-                                } catch (error) {
-                                    return ReE(res, error, 400)
-                                }
-                                return ReS(res, { message: "You have joined this challenge", success: true, challenge: challenge }, 200)
-                            }
-
-                            else {
-                                return ReE(res, { message: "You have already joined in this challenge", success: false }, 400)
-                            }
+                            return ReE(res, { message: "Challenge is completed.", success: false }, 400)
                         }
-                    }
-
-                    else {
-                        return ReE(res, { message: "Challenge is completed.", success: false }, 400)
-                    }
                     }
 
                     else{

@@ -228,7 +228,7 @@ module.exports.getAuth = getAuth
 const getTransactions = async function (request, response, next) {
   // Pull transactions for the Item for the last 30 days
   const address = request.query.address
-  const startDate = moment().subtract(90, 'days').format('YYYY-MM-DD');
+  const startDate = moment().subtract(7, 'days').format('YYYY-MM-DD');
   const endDate = moment().format('YYYY-MM-DD');
   const configs = {
     access_token: ACCESS_TOKEN,
@@ -259,11 +259,12 @@ const getTransactions = async function (request, response, next) {
     let rows = []
 
     transactions.map((t) => {
-      let sat = (Math.ceil(t.amount) - t.amount)
+
+      let sat = (Math.ceil(t.amount) - t.amount) * 100
 
       let time = moment(t.date).utc().valueOf()
 
-      gwei = new BigNumber(String(parseInt(sat * 100))).plus(new BigNumber(gwei)).toString()
+      gwei = new BigNumber(String(parseInt(sat))).plus(new BigNumber(gwei)).toString()
 
       // eth = new BigNumber(new BigNumber(String(parseInt(sat * 100)))).div(new BigNumber('1000000000000000000'), 10).plus(new BigNumber(eth)).toString(10)
 
@@ -274,6 +275,7 @@ const getTransactions = async function (request, response, next) {
             name: t.name.replace(/[^a-zA-Z- ]/g, ""),
             amount: t.amount,
             address: request.query.address,
+            category:t.category.toString(),
             iso_currency_code: t.iso_currency_code,
             sats: sat,
             createdAt: moment(t.date).utc().valueOf()
@@ -290,6 +292,7 @@ const getTransactions = async function (request, response, next) {
               name: t.name.replace(/[^a-zA-Z- ]/g, ""),
               amount: t.amount,
               address: address,
+              category:t.category.toString(),
               iso_currency_code: t.iso_currency_code,
               sats: sat,
               createdAt: moment(t.date).utc().valueOf()
@@ -311,6 +314,8 @@ const getTransactions = async function (request, response, next) {
     } catch (error) {
       console.log("Checking db error....", error);
     }
+
+
 
     let err, user
 
@@ -436,8 +441,7 @@ module.exports.getUser = getUser
 const checkUserName = async function (req, res) {
   let user, err
 
-  [err, user] = await to(Users.find({ fullName: { $regex: "^" + req.params.name } }))
-
+  [err, user] = await to(Users.find({ fullName: new RegExp( `^${req.params.name}` ,'i') }))
   if (err) {
     return ReE(res, err, 400)
   }
