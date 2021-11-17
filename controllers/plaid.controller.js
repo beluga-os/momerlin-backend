@@ -228,7 +228,7 @@ module.exports.getAuth = getAuth
 const getTransactions = async function (request, response, next) {
   // Pull transactions for the Item for the last 30 days
   const address = request.query.address
-  const startDate = moment().subtract(7, 'days').format('YYYY-MM-DD');
+  const startDate = moment().subtract(90, 'days').format('YYYY-MM-DD');
   const endDate = moment().format('YYYY-MM-DD');
   const configs = {
     access_token: ACCESS_TOKEN,
