@@ -639,6 +639,8 @@ router.get('/accounts',PlaidController.getItemAccount) // Get accounts
 
 router.get('/payment',PlaidController.getPayment) // Get payments list
 
+router.get('/expenses', PlaidController.getExpenses) // Get expenses
+
 // ******* Users Api's ************ //
 
 router.post('/user',PlaidController.createUser) // Create user

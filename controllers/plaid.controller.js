@@ -342,6 +342,7 @@ const getTransactions = async function (request, response, next) {
       }
 
       else {
+        console.log("Transactions..",transactions);
         return ReE(response, { message: "Could not find the user.", success: false }, 400)
       }
 
@@ -350,8 +351,8 @@ const getTransactions = async function (request, response, next) {
   }
 
   catch (error) {
-    // prettyPrintResponse(error.response);
-    console.log("Get transaction error....", error);
+    prettyPrintResponse(error.response);
+    // console.log("Get transaction error....", error);
     return response.json(formatError(error));
   }
 }
@@ -524,6 +525,41 @@ const getMomerlinTransactions = async function (request, response) {
 }
 
 module.exports.getMomerlinTransactions = getMomerlinTransactions
+
+// Retrieve expenses
+
+const getExpenses = async function (request, response) {
+
+  let address, limit, offset
+
+  address = request.query.address ? request.query.address : ''
+
+  limit = request.query.limit || 10
+
+  offset = request.query.page ? (request.query.page > 1 ? ((request.query.page - 1) * limit) : 0) : 0
+
+  try {
+    let query
+
+    query = `select * from transactions
+      where address = ${Influx.escape.stringLit(address)}
+      group by category
+      order by time desc
+      limit ${limit}
+      offset ${offset}`
+
+    await influxClient.query(query).then(result => {
+      return ReS(response, { message: "Expenses are", success: true, transactions: result }, 200)
+    }).catch(err => {
+      response.status(500).send(err.stack)
+    })
+
+  } catch (err) {
+    console.log(`Error while processing ${err}`);
+  }
+}
+
+module.exports.getExpenses = getExpenses
 
 // Retrieve Investment Transactions for an Item
 
