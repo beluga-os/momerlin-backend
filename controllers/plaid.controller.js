@@ -760,6 +760,102 @@ const getPayment = async function (request, response, next) {
 
 module.exports.getPayment = getPayment
 
+
+const mockTransactions = async function (req, res) {
+  let data = [
+    {
+      displayName: "Coffee",
+      category: "Food and Drink,Restaurants,Coffee Shop",
+      image: "https://momerlin.s3.amazonaws.com/down.jpeg",
+      color: "#6C6AEB",
+      transactionsCount: 10,
+      percentage: 10,
+      amount: 500
+    },
+    {
+      displayName: "Food",
+      category: "Food and Drink,Restaurants",
+      image: "https://momerlin.s3.amazonaws.com/down.jpeg",
+      color: "#6C6AEB",
+      transactionsCount: 17,
+      percentage: 5,
+      amount: 300
+    },
+    {
+      displayName: "Food and Drink",
+      category: "Food and Drink,Restaurants,Fast Food",
+      image: "https://momerlin.s3.amazonaws.com/down.jpeg",
+      color: "#6C6AEB",
+      transactionsCount: 10,
+      percentage: 5,
+      amount: 150
+    },
+    {
+      displayName: "Fitness",
+      category: "Recreation,Gyms and Fitness Centers",
+      image: "https://momerlin.s3.amazonaws.com/down.jpeg",
+      color: "#6C6AEB",
+      transactionsCount: 20,
+      percentage: 15,
+      amount: 600
+    },
+    {
+      displayName: "Travel",
+      category: "Travel,Taxi",
+      image: "https://momerlin.s3.amazonaws.com/down.jpeg",
+      color: "#6C6AEB",
+      transactionsCount: 20,
+      percentage: 10,
+      amount: 500
+    },
+    {
+      displayName: "Food",
+      category: "Food and Drink,Restaurants",
+      image: "https://momerlin.s3.amazonaws.com/down.jpeg",
+      color: "#6C6AEB",
+      transactionsCount: 17,
+      percentage: 5,
+      amount: 300
+    }, {
+      displayName: "Fitness",
+      category: "Recreation,Gyms and Fitness Centers",
+      image: "https://momerlin.s3.amazonaws.com/down.jpeg",
+      color: "#6C6AEB",
+      transactionsCount: 20,
+      percentage: 15,
+      amount: 600
+    }, {
+      displayName: "Coffee",
+      category: "Food and Drink,Restaurants,Coffee Shop",
+      image: "https://momerlin.s3.amazonaws.com/down.jpeg",
+      color: "#6C6AEB",
+      transactionsCount: 10,
+      percentage: 10,
+      amount: 500
+    }, {
+      displayName: "Travel",
+      category: "Travel,Taxi",
+      image: "https://momerlin.s3.amazonaws.com/down.jpeg",
+      color: "#6C6AEB",
+      transactionsCount: 20,
+      percentage: 10,
+      amount: 500
+    }, {
+      displayName: "Food and Drink",
+      category: "Food and Drink,Restaurants,Fast Food",
+      image: "https://momerlin.s3.amazonaws.com/down.jpeg",
+      color: "#6C6AEB",
+      transactionsCount: 10,
+      percentage: 5,
+      amount: 150
+    }
+  ]
+
+  return ReS(res, { message: "My expenses are", success: true, expenses: data }, 200)
+}
+
+module.exports.mockTransactions = mockTransactions
+
 const prettyPrintResponse = (response) => {
   console.log(util.inspect(response.data, { colors: true, depth: 4 }));
 };
@@ -799,6 +895,7 @@ const getAssetReportWithRetries = (
         }, ms);
       });
   });
+
 
 const formatError = (error) => {
   return {
