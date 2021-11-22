@@ -778,7 +778,7 @@ const mockTransactions = async function (req, res) {
       image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
       color: "#8ADC72",
       transactionsCount: 17,
-      percentage: 0.5,
+      percentage: 0.05,
       amount: 300
     },
     {
@@ -787,7 +787,7 @@ const mockTransactions = async function (req, res) {
       image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
       color: "#6C6AEB",
       transactionsCount: 10,
-      percentage: 0.5,
+      percentage: 0.05,
       amount: 150
     },
     {
@@ -824,7 +824,7 @@ const mockTransactions = async function (req, res) {
       image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
       color: "#8ADC72",
       transactionsCount: 17,
-      percentage: 0.5,
+      percentage: 0.05,
       amount: 300
     },
     {
