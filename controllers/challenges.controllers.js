@@ -701,6 +701,7 @@ const getMyActivity = async function (req,res) {
     }
     id = req.params.id
 
+    console.log("Checking id...",id);
     [err,activities] = await to(ChallengeTracker.find({competitor:ObjectId(id)}).sort({updatedAt:-1}).populate("challenge"))
 
     if(err) return ReE(res,{err},400)
