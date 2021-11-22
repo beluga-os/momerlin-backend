@@ -766,7 +766,7 @@ const mockTransactions = async function (req, res) {
     {
       displayName: "Coffee",
       category: "Food and Drink,Restaurants,Coffee Shop",
-      image: "https://momerlin.s3.amazonaws.com/down.jpeg",
+      image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
       color: "#6C6AEB",
       transactionsCount: 10,
       percentage: 10,
@@ -775,7 +775,7 @@ const mockTransactions = async function (req, res) {
     {
       displayName: "Food",
       category: "Food and Drink,Restaurants",
-      image: "https://momerlin.s3.amazonaws.com/down.jpeg",
+      image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
       color: "#6C6AEB",
       transactionsCount: 17,
       percentage: 5,
@@ -784,7 +784,7 @@ const mockTransactions = async function (req, res) {
     {
       displayName: "Food and Drink",
       category: "Food and Drink,Restaurants,Fast Food",
-      image: "https://momerlin.s3.amazonaws.com/down.jpeg",
+      image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
       color: "#6C6AEB",
       transactionsCount: 10,
       percentage: 5,
@@ -793,7 +793,7 @@ const mockTransactions = async function (req, res) {
     {
       displayName: "Fitness",
       category: "Recreation,Gyms and Fitness Centers",
-      image: "https://momerlin.s3.amazonaws.com/down.jpeg",
+      image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
       color: "#6C6AEB",
       transactionsCount: 20,
       percentage: 15,
@@ -802,7 +802,7 @@ const mockTransactions = async function (req, res) {
     {
       displayName: "Travel",
       category: "Travel,Taxi",
-      image: "https://momerlin.s3.amazonaws.com/down.jpeg",
+      image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
       color: "#6C6AEB",
       transactionsCount: 20,
       percentage: 10,
@@ -811,7 +811,7 @@ const mockTransactions = async function (req, res) {
     {
       displayName: "Food",
       category: "Food and Drink,Restaurants",
-      image: "https://momerlin.s3.amazonaws.com/down.jpeg",
+      image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
       color: "#6C6AEB",
       transactionsCount: 17,
       percentage: 5,
@@ -819,7 +819,7 @@ const mockTransactions = async function (req, res) {
     }, {
       displayName: "Fitness",
       category: "Recreation,Gyms and Fitness Centers",
-      image: "https://momerlin.s3.amazonaws.com/down.jpeg",
+      image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
       color: "#6C6AEB",
       transactionsCount: 20,
       percentage: 15,
@@ -827,7 +827,7 @@ const mockTransactions = async function (req, res) {
     }, {
       displayName: "Coffee",
       category: "Food and Drink,Restaurants,Coffee Shop",
-      image: "https://momerlin.s3.amazonaws.com/down.jpeg",
+      image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
       color: "#6C6AEB",
       transactionsCount: 10,
       percentage: 10,
@@ -835,7 +835,7 @@ const mockTransactions = async function (req, res) {
     }, {
       displayName: "Travel",
       category: "Travel,Taxi",
-      image: "https://momerlin.s3.amazonaws.com/down.jpeg",
+      image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
       color: "#6C6AEB",
       transactionsCount: 20,
       percentage: 10,
@@ -843,7 +843,7 @@ const mockTransactions = async function (req, res) {
     }, {
       displayName: "Food and Drink",
       category: "Food and Drink,Restaurants,Fast Food",
-      image: "https://momerlin.s3.amazonaws.com/down.jpeg",
+      image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
       color: "#6C6AEB",
       transactionsCount: 10,
       percentage: 5,

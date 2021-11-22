@@ -692,11 +692,11 @@ const getMyActivity = async function (req,res) {
     let asset = {
         gold:{
             color:"#FF9BB3",
-            image:"https://momerlin.s3.amazonaws.com/gold.jpeg"
+            image:"https://momerlin.s3.amazonaws.com/dev/images/spend_reports/gold.jpeg"
         },
         down:{
             color:"#EB9355",
-            image:"https://momerlin.s3.amazonaws.com/down.jpeg"
+            image:"https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg"
         }
     }
     id = req.params.id
