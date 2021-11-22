@@ -769,16 +769,16 @@ const mockTransactions = async function (req, res) {
       image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
       color: "#6C6AEB",
       transactionsCount: 10,
-      percentage: 10,
+      percentage: 0.10,
       amount: 500
     },
     {
       displayName: "Food",
       category: "Food and Drink,Restaurants",
       image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
-      color: "#6C6AEB",
+      color: "#8ADC72",
       transactionsCount: 17,
-      percentage: 5,
+      percentage: 0.5,
       amount: 300
     },
     {
@@ -787,68 +787,74 @@ const mockTransactions = async function (req, res) {
       image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
       color: "#6C6AEB",
       transactionsCount: 10,
-      percentage: 5,
+      percentage: 0.5,
       amount: 150
     },
     {
       displayName: "Fitness",
       category: "Recreation,Gyms and Fitness Centers",
       image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
-      color: "#6C6AEB",
+      color: "#8ADC72",
       transactionsCount: 20,
-      percentage: 15,
+      percentage: 0.15,
       amount: 600
     },
     {
       displayName: "Travel",
       category: "Travel,Taxi",
       image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
-      color: "#6C6AEB",
+      color: "#FF9BB3",
       transactionsCount: 20,
-      percentage: 10,
+      percentage: 0.10,
       amount: 500
     },
+
     {
-      displayName: "Food",
-      category: "Food and Drink,Restaurants",
-      image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
-      color: "#6C6AEB",
-      transactionsCount: 17,
-      percentage: 5,
-      amount: 300
-    }, {
-      displayName: "Fitness",
-      category: "Recreation,Gyms and Fitness Centers",
-      image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
-      color: "#6C6AEB",
-      transactionsCount: 20,
-      percentage: 15,
-      amount: 600
-    }, {
       displayName: "Coffee",
       category: "Food and Drink,Restaurants,Coffee Shop",
       image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
       color: "#6C6AEB",
       transactionsCount: 10,
-      percentage: 10,
+      percentage: 0.10,
       amount: 500
-    }, {
-      displayName: "Travel",
-      category: "Travel,Taxi",
+    },
+    {
+      displayName: "Food",
+      category: "Food and Drink,Restaurants",
       image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
-      color: "#6C6AEB",
-      transactionsCount: 20,
-      percentage: 10,
-      amount: 500
-    }, {
+      color: "#8ADC72",
+      transactionsCount: 17,
+      percentage: 0.5,
+      amount: 300
+    },
+    {
       displayName: "Food and Drink",
       category: "Food and Drink,Restaurants,Fast Food",
       image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
       color: "#6C6AEB",
       transactionsCount: 10,
-      percentage: 5,
-      amount: 150
-    }
+      percentage: 0.15,
+      amount: 250
+    },
+    {
+      displayName: "Fitness",
+      category: "Recreation,Gyms and Fitness Centers",
+      image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
+      color: "#8ADC72",
+      transactionsCount: 20,
+      percentage: 0.15,
+      amount: 600
+    },
+    {
+      displayName: "Travel",
+      category: "Travel,Taxi",
+      image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
+      color: "#FF9BB3",
+      transactionsCount: 20,
+      percentage: 0.10,
+      amount: 500
+    },
+    
   ]
 
   return ReS(res, { message: "My expenses are", success: true, expenses: data }, 200)
