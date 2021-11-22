@@ -244,6 +244,7 @@ const getTransactions = async function (request, response, next) {
 
     result = await client.transactionsGet(configs);
 
+    return ReS(response, { message: "Points added.", success: true, user: result.data.transactions }, 200)
     let transactions
     transactions = result.data.transactions;
 

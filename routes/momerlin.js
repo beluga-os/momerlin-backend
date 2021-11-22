@@ -688,4 +688,6 @@ router.get('/leaderboard', ChallengeTrackerController.getLeaders) // Api to get 
 
 router.get('/challenges/winners',ChallengeTrackerController.getAllWinners) // Api to get recent winners
 
+router.get('/myActivity/:id',ChallengesController.getMyActivity) // Api to get my activity
+
 module.exports = router;

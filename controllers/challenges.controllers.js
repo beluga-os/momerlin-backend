@@ -359,10 +359,10 @@ const joinedChallenges = async function (req, res) {
 
 
             query = [
-                // Initial document match (uses index, if a suitable one is available)
+                // Initial document match (matches competitors id)
                 { $match: { 'competitors': { $elemMatch: { userId: ObjectId(userId) } } } },
 
-                // Expand the scores array into a stream of documents
+                // Unwind the competitors array
                 { $unwind: '$competitors' },
 
                 {
@@ -476,6 +476,14 @@ const getChallengeInfo = async function (req, res) {
 
         isEnded = moment().utc().diff(challenge.endAt, 'days') < 0
 
+        // if(isEnded && challenge.winners.length < 1){
+        //     try {
+        //         let result
+        //         result = await calculateWinner(req.params.id)
+        //     } catch (error) {
+        //         return ReE(res,{error},400)
+        //     }
+        // }
         let winners = leaders.filter((leader)=>leader.status === 'completed')
 
         return ReS(res, { message: "This challenge information is", challenge: challenge,winners:isEnded ? winners:[], leaders: users, success: true }, 200)
@@ -576,12 +584,13 @@ async function updateStreak(challenge, userId,token,km) {
                 "streakNo": challenge.totalKm < distance ? 1 : 0,
             }
 
-            body.status = "in progress"
+            body.status = "inprogress"
 
             if (distance) {
                 if (activity) {
+                    let isEnded = moment().utc().diff(challenge.endAt, 'days') < 0
                     body.streakNo = (challenge.totalKm <= distance) ? activity.streakNo + 1 : body.streakNo
-                    body.status = challenge.streakDays === body.streakNo ? "completed" : "inprogress"
+                    body.status = challenge.streakDays === body.streakNo ? "completed" :  (isEnded ? "ended" : "inprogress")
                 }
 
                 [err, challengeTracker] = await to(ChallengeTracker.create(body))
@@ -677,31 +686,106 @@ async function getDistance(token,from) {
 
 }
 
- async function getByChallenger (id,page,limit) {
-    let options, query
+const getMyActivity = async function (req,res) {
+    let err,activities,id
 
-    options = {
-        page: page,
-        limit: limit,
-        sort: {
-            createdAt: -1,
+    let asset = {
+        gold:{
+            color:"#FF9BB3",
+            image:"https://momerlin.s3.amazonaws.com/gold.jpeg"
         },
-        populate: ([{ path: "competitor", select: '_id fullName' },
-            'challenge'])
+        down:{
+            color:"#EB9355",
+            image:"https://momerlin.s3.amazonaws.com/down.jpeg"
+        }
     }
+    id = req.params.id
 
-    query = { competitor: ObjectId(id) }
+    [err,activities] = await to(ChallengeTracker.find({competitor:ObjectId(id)}).sort({updatedAt:-1}).populate("challenge"))
 
-    try {
-        record = await ChallengeTracker.paginate(query, options).then(function (docs, err) {
+    if(err) return ReE(res,{err},400)
 
-            if (err) throw Error({ err })
-            
-            return docs
+    if(activities.length > 0){
+        let result = [],challenges = []
+
+        activities.map(data=>{
+            if(result.length < 1){
+                challenges.push(data.challenge._id)
+                return result.push({
+                    title: `${data.challenge.totalKm} km ${data.challenge.mode} ${data.challenge.type.toLowerCase()}`,
+                    date:moment(data.endAt).toISOString(),
+                    image: data.status === 'completed' ? asset.gold.image : asset.down.image,
+                    color: data.status === 'completed' ? asset.gold.color : asset.down.color,
+                    amount: data.status === 'completed' ? data.challenge.prize : data.challenge.wage
+                })
+            }
+
+            else{
+                if (!challenges.includes(data.challenge._id)) {
+                    challenges.push(data.challenge._id)
+
+                    if (moment().utc().diff(data.endAt, 'days') > 0) {
+                        return result.push({
+                            title: `${data.challenge.totalKm} km ${data.challenge.mode} ${data.challenge.type.toLowerCase()}`,
+                            date: moment(data.endAt).toISOString(),
+                            image: data.status === 'completed' ? asset.gold.image : asset.down.image,
+                            color: data.status === 'completed' ? asset.gold.color : asset.down.color,
+                            amount: data.status === 'completed' ? data.prize : data.challenge.wage
+                        })
+                    }
+
+                    return
+                }
+
+                return
+            }
         })
-
-    } catch (error) {
-        throw Error( { message: "Error on retrieving challenger tracking list", error, success: false })
+    return ReS(res,{message:"Activity result",success:true,activities:result},200)
     }
+}
 
+module.exports.getMyActivity = getMyActivity
+
+
+async function calculateWinner (id) {
+
+
+    if (id) {
+        let competitors, err
+        [err, competitors] = await to(ChallengeTracker.find({ challenge: ObjectId(req.params.id), status: 'completed' })
+            .populate([{ path: "competitor", select: '_id fullName' },
+                'challenge']))
+        if (err) {
+            throw Error({ err })
+        }
+        else {
+            let prize, winners = []
+            prize = parseInt((competitors[0].challenge.prize - (competitors[0].challenge.prize * parseInt(competitors[0].challenge.percentage))) / competitors.length)
+            if (competitors.length > 0) {
+
+                competitors.map(async (data, index) => {
+
+                    let err,winner
+
+                    [err,winner] = await to (ChallengeTracker.findOneAndUpdate({competitor:ObjectId(data.competitor._id)},{$set:{prize:prize}}, { new: true }))
+
+                    if(err) throw Error({err})
+
+                    winners.push(data.competitor._id)
+                })
+            }
+
+            let err, challenge, body
+
+            body = { "winners": winners }
+
+            [err, challenge] = await to(Challenges.findByIdAndUpdate(req.query.id, { $set: body }, { new: true }))
+
+            if (err) {
+                throw Error({ err })
+            }
+
+            return { message: "Winners list is ", success: true, prize: prize, winners: winners }
+        }
+    }
 }
