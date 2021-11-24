@@ -641,7 +641,11 @@ router.get('/payment',PlaidController.getPayment) // Get payments list
 
 router.get('/expenses', PlaidController.getExpenses) // Get expenses
 
-router.get('/myExpenses', PlaidController.mockTransactions) // Mock api for expenses
+router.get('/myExpenses/:address', PlaidController.mockTransactions) // Mock api for expenses
+
+router.post('/category', PlaidController.addCategory) // Create category api
+
+router.delete('/category/deActivate/:id', PlaidController.deActivateCategory) // De-Activate category api
 
 // ******* Users Api's ************ //
 

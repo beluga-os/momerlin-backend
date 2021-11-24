@@ -6,7 +6,7 @@ const { Configuration, PlaidApi, PlaidEnvironments } = require('plaid');
 const util = require('util');
 const moment = require('moment');
 const Users = require("../models/user.model")
-
+const TransactionCategories = require("../models/transactionCategory.model")
 const Influx = require('influx');
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
 const PLAID_SECRET = process.env.PLAID_SECRET;
@@ -244,7 +244,6 @@ const getTransactions = async function (request, response, next) {
 
     result = await client.transactionsGet(configs);
 
-    return ReS(response, { message: "Points added.", success: true, user: result.data.transactions }, 200)
     let transactions
     transactions = result.data.transactions;
 
@@ -276,15 +275,15 @@ const getTransactions = async function (request, response, next) {
             name: t.name.replace(/[^a-zA-Z- ]/g, ""),
             amount: t.amount,
             address: request.query.address,
-            category:t.category.toString(),
+            category:t.category[0].toString(),
             iso_currency_code: t.iso_currency_code,
-            sats: sat,
             createdAt: moment(t.date).utc().valueOf()
           },
           fields: {
+            sats: sat,
             merchant_name: t.merchant_name.replace(/[^a-zA-Z- ]/g, "")
           },
-          timestamp: time,
+          timestamp: time * 1000,
         }) :
           (recent.length > 0 && time > parseInt(recent[0].createdAt)) &&
           rows.push({
@@ -293,15 +292,15 @@ const getTransactions = async function (request, response, next) {
               name: t.name.replace(/[^a-zA-Z- ]/g, ""),
               amount: t.amount,
               address: address,
-              category:t.category.toString(),
+              category:t.category[0].toString(),
               iso_currency_code: t.iso_currency_code,
-              sats: sat,
               createdAt: moment(t.date).utc().valueOf()
             },
             fields: {
+              sats: sat,
               merchant_name: t.merchant_name.replace(/[^a-zA-Z- ]/g, "")
             },
-            timestamp: time,
+            timestamp: time * 1000,
           })
       }
     });
@@ -346,7 +345,6 @@ const getTransactions = async function (request, response, next) {
         console.log("Transactions..",transactions);
         return ReE(response, { message: "Could not find the user.", success: false }, 400)
       }
-
     }
 
   }
@@ -760,104 +758,123 @@ const getPayment = async function (request, response, next) {
 
 module.exports.getPayment = getPayment
 
+const addCategory = async function (req,res) {
+  
+  let err,body,category
+
+  body = req.body
+
+  console.log("Checking body...",body);
+  
+  [err,body] = await to (TransactionCategories.create(body))
+
+  if(err){
+    return ReE(res,{err},400)
+  }
+
+  else{
+    return ReS(res,{message:"Category is created.",success:true,category:category},200)
+  }
+}
+
+module.exports.addCategory = addCategory
+
+const deActivateCategory = async function (req,res) {
+  
+  let err,category,id
+
+  id = req.params.id
+
+  console.log("Checking id...",id);
+
+  [err, category] = await to(TransactionCategories.findByIdAndUpdate(id, { $set: { active: false } }, { new: true }))
+
+  if(err){
+    return ReE(res,{err},400)
+  }
+
+  else{
+    return ReS(res,{message:"Category removed successfully",success:true},200)
+  }
+}
+
+module.exports.deActivateCategory = deActivateCategory
 
 const mockTransactions = async function (req, res) {
-  let data = [
-    {
-      displayName: "Coffee",
-      category: "Food and Drink,Restaurants,Coffee Shop",
-      image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
-      color: "#6C6AEB",
-      transactionsCount: 10,
-      percentage: 0.10,
-      amount: 500
-    },
-    {
-      displayName: "Food",
-      category: "Food and Drink,Restaurants",
-      image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
-      color: "#8ADC72",
-      transactionsCount: 17,
-      percentage: 0.05,
-      amount: 300
-    },
-    {
-      displayName: "Food and Drink",
-      category: "Food and Drink,Restaurants,Fast Food",
-      image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
-      color: "#6C6AEB",
-      transactionsCount: 10,
-      percentage: 0.05,
-      amount: 150
-    },
-    {
-      displayName: "Fitness",
-      category: "Recreation,Gyms and Fitness Centers",
-      image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
-      color: "#8ADC72",
-      transactionsCount: 20,
-      percentage: 0.15,
-      amount: 600
-    },
-    {
-      displayName: "Travel",
-      category: "Travel,Taxi",
-      image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
-      color: "#FF9BB3",
-      transactionsCount: 20,
-      percentage: 0.10,
-      amount: 500
-    },
 
-    {
-      displayName: "Coffee",
-      category: "Food and Drink,Restaurants,Coffee Shop",
-      image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
-      color: "#6C6AEB",
-      transactionsCount: 10,
-      percentage: 0.10,
-      amount: 500
-    },
-    {
-      displayName: "Food",
-      category: "Food and Drink,Restaurants",
-      image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
-      color: "#8ADC72",
-      transactionsCount: 17,
-      percentage: 0.05,
-      amount: 300
-    },
-    {
-      displayName: "Food and Drink",
-      category: "Food and Drink,Restaurants,Fast Food",
-      image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
-      color: "#6C6AEB",
-      transactionsCount: 10,
-      percentage: 0.15,
-      amount: 250
-    },
-    {
-      displayName: "Fitness",
-      category: "Recreation,Gyms and Fitness Centers",
-      image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
-      color: "#8ADC72",
-      transactionsCount: 20,
-      percentage: 0.15,
-      amount: 600
-    },
-    {
-      displayName: "Travel",
-      category: "Travel,Taxi",
-      image: "https://momerlin.s3.amazonaws.com/dev/images/spend_reports/down.jpeg",
-      color: "#FF9BB3",
-      transactionsCount: 20,
-      percentage: 0.10,
-      amount: 500
-    },
-    
-  ]
+  let address,total,categories,spendings = [],categoryWiseQuery = `SELECT sum("sats") AS "amount",count("merchant_name") as "total_transactions" FROM "transactions" GROUP BY category`,totalQuery
 
-  return ReS(res, { message: "My expenses are", success: true, expenses: data }, 200)
+  address = req.params.address
+
+  totalQuery = `SELECT sum("sats") AS "amount" FROM transactions where address = ${Influx.escape.stringLit(address)}`
+
+  console.log("Checking address..",address);
+  try {
+    await influxClient.query(totalQuery).then(async (result) => {
+      total = result
+
+      try {
+        await influxClient.query(categoryWiseQuery).then(async result => {
+          categories = result
+
+          let count = categories.length -1;
+          if(categories && categories.length > 0){
+           await categories.map(async (data)=>{
+
+              let err,category
+
+              console.log("Checking params...",data.category);
+              [err,category] = await to(TransactionCategories.findOne({name:data.category,active:true}))
+
+              if(err){
+                return console.log("Error while matching category",err);
+              }
+
+              else{
+
+                if(category !== null && category !== {}){
+                  
+                  if (count === spendings.length) {
+                    spendings.push({
+                      category: category,
+                      transactionsCount: data.total_transactions,
+                      percentage: (parseFloat(data.amount) / parseFloat(total[0].amount)) * 100,
+                      amount: data.amount
+                    })
+
+                    return ReS(res, { message: "Spending reports are...", success: true, spendings: spendings }, 200)
+                  }
+                  else {
+
+                    return spendings.push({
+                      category: category,
+                      transactionsCount: data.total_transactions,
+                      percentage: (parseFloat(data.amount) / parseFloat(total[0].amount)) * 100,
+                      amount: data.amount
+                    })
+                  }
+                }
+
+                else{
+                  return {}
+                }
+              }
+            })
+
+          }
+
+        })
+      } catch (error) {
+        console.log(`Error while processing ${error}`);
+      }
+    }).catch(err => {
+      response.status(500).send(err.stack)
+    })
+
+  } catch (err) {
+    console.log(`Error while processing ${err}`);
+  }
+
 }
 
 module.exports.mockTransactions = mockTransactions
