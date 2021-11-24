@@ -743,6 +743,11 @@ const getMyActivity = async function (req,res) {
         })
     return ReS(res,{message:"Activity result",success:true,activities:result},200)
     }
+
+    else{
+        return ReS(res,{message:"Activity result",success:true,activities:[]},200)
+    }
+
 }
 
 module.exports.getMyActivity = getMyActivity
