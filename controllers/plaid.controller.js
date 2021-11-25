@@ -766,7 +766,7 @@ const addCategory = async function (req,res) {
 
   console.log("Checking body...",body);
   
-  [err,body] = await to (TransactionCategories.create(body))
+  [err,category] = await to (TransactionCategories.create(body))
 
   if(err){
     return ReE(res,{err},400)
@@ -826,11 +826,17 @@ module.exports.getTransactionsByCategory = getTransactionsByCategory
 
 const mySpendings = async function (req, res) {
 
-  let address,total,categories,spendings = [],categoryWiseQuery = `SELECT sum("sats") AS "amount",count("merchant_name") as "total_transactions" FROM "transactions" GROUP BY category`,totalQuery
+  let address,total,categories,startDate,endDate,spendings = [],categoryWiseQuery,totalQuery
 
   address = req.params.address
 
-  totalQuery = `SELECT sum("sats") AS "amount" FROM transactions where address = ${Influx.escape.stringLit(address)}`
+  startDate = (req.query.startDate !== undefined && req.query.startDate !== null) ? moment(req.query.startDate).valueOf() * 1000 : null;
+  
+  endDate = (req.query.endDate !== undefined && req.query.endDate !== null) ? moment(req.query.endDate).valueOf() * 1000 : null;
+
+  totalQuery =  `SELECT sum("sats") AS "amount" FROM transactions where address = ${Influx.escape.stringLit(address)}`
+  
+  categoryWiseQuery = (from !== null && to !== null) ? `SELECT sum("sats") AS "amount",count("merchant_name") as "total_transactions" FROM "transactions" WHERE address = ${Influx.escape.stringLit(address)} and time >= ${startDate} and time <= ${endDate} GROUP BY category` : `SELECT sum("sats") AS "amount",count("merchant_name") as "total_transactions" FROM "transactions" GROUP BY category`
 
   console.log("Checking address..",address);
   try {
@@ -880,11 +886,32 @@ const mySpendings = async function (req, res) {
                 }
 
                 else{
-                  return {}
+                  let err,body,newCategory
+
+                  body = {
+                    displayName:data.category,
+                    name:data.category,
+                    color:"",
+                    image:""
+                  }
+
+                  [err, category] = await to(TransactionCategories.create(body))
+
+                  if (err) {
+                    throw Error({ err })
+                  }
+
+                  else {
+                    return spendings.push(category)
+                  }
                 }
               }
             })
 
+          }
+
+          else{
+            return ReE(res,{message:"Transactions not found for this user.Please connect your bank and try again.",success:false},400)
           }
 
         })

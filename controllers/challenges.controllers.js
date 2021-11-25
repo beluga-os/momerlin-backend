@@ -8,6 +8,7 @@ const axios = require('axios');
 const BigNumber = require('bignumber.js')
 
 const ObjectId = require('mongoose').Types.ObjectId;
+const { query } = require('express');
 // Create challange
 
 const createChallenge = async function (req, res) {
@@ -687,7 +688,7 @@ async function getDistance(token,from) {
 }
 
 const getMyActivity = async function (req,res) {
-    let err,activities,id
+    let id,startDate,lastDate
 
     let asset = {
         gold:{
@@ -701,8 +702,17 @@ const getMyActivity = async function (req,res) {
     }
     id = req.params.id
 
+    startDate = (req.query.startDate !== undefined && req.query.startDate !== null) ? moment(req.query.startDate).toISOString() : null;
+  
+    lastDate = (req.query.lastDate !== undefined && req.query.lastDate !== null) ? moment(req.query.lastDate).toISOString() : null;
+
+    let query = (startDate !== null && to !== null) ? {competitor:ObjectId(id),createdAt: {$gte : new Date(startDate),$lte: new Date(lastDate)}} : {competitor:ObjectId(id)}
+
     console.log("Checking id...",id);
-    [err,activities] = await to(ChallengeTracker.find({competitor:ObjectId(id)}).sort({updatedAt:-1}).populate("challenge"))
+
+    let err,activities
+    
+    [err,activities] = await to(ChallengeTracker.find(query).sort({updatedAt:-1}).populate("challenge"))
 
     if(err) return ReE(res,{err},400)
 
