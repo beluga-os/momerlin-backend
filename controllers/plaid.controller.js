@@ -836,7 +836,7 @@ const mySpendings = async function (req, res) {
 
   totalQuery =  `SELECT sum("sats") AS "amount" FROM transactions where address = ${Influx.escape.stringLit(address)}`
   
-  categoryWiseQuery = (from !== null && to !== null) ? `SELECT sum("sats") AS "amount",count("merchant_name") as "total_transactions" FROM "transactions" WHERE address = ${Influx.escape.stringLit(address)} and time >= ${startDate} and time <= ${endDate} GROUP BY category` : `SELECT sum("sats") AS "amount",count("merchant_name") as "total_transactions" FROM "transactions" GROUP BY category`
+  categoryWiseQuery = (startDate !== null && endDate !== null) ? `SELECT sum("sats") AS "amount",count("merchant_name") as "total_transactions" FROM "transactions" WHERE address = ${Influx.escape.stringLit(address)} and time >= ${startDate} and time <= ${endDate} GROUP BY category` : `SELECT sum("sats") AS "amount",count("merchant_name") as "total_transactions" FROM "transactions" GROUP BY category`
 
   console.log("Checking address..",address);
   try {
@@ -895,14 +895,18 @@ const mySpendings = async function (req, res) {
                     image:""
                   }
 
-                  [err, category] = await to(TransactionCategories.create(body))
+                  [err, newCategory] = await to(TransactionCategories.create(body))
 
                   if (err) {
                     throw Error({ err })
                   }
 
                   else {
-                    return spendings.push(category)
+                    return spendings.push({
+                      category: newCategory,
+                      transactionsCount: data.total_transactions,
+                      percentage: (parseFloat(data.amount) / parseFloat(total[0].amount)) * 100,
+                      amount: data.amount})
                   }
                 }
               }
