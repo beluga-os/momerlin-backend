@@ -843,84 +843,92 @@ const mySpendings = async function (req, res) {
     await influxClient.query(totalQuery).then(async (result) => {
       total = result
 
-      try {
-        await influxClient.query(categoryWiseQuery).then(async result => {
-          categories = result
+      if(result.length > 0){
 
-          let count = categories.length -1;
-          if(categories && categories.length > 0){
-           await categories.map(async (data)=>{
+        try {
+          await influxClient.query(categoryWiseQuery).then(async result => {
+            categories = result
 
-              let err,category
+            let count = categories.length - 1;
+            if (categories && categories.length > 0) {
+              await categories.map(async (data) => {
 
-              console.log("Checking params...",data.category);
-              [err,category] = await to(TransactionCategories.findOne({name:data.category,active:true}))
+                let err, category
 
-              if(err){
-                return console.log("Error while matching category",err);
-              }
+                console.log("Checking params...", data.category);
+                [err, category] = await to(TransactionCategories.findOne({ name: data.category, active: true }))
 
-              else{
-
-                if(category !== null && category !== {}){
-                  
-                  if (count === spendings.length) {
-                    spendings.push({
-                      category: category,
-                      transactionsCount: data.total_transactions,
-                      percentage: (parseFloat(data.amount) / parseFloat(total[0].amount)) * 100,
-                      amount: data.amount
-                    })
-
-                    return ReS(res, { message: "Spending reports are...", success: true, spendings: spendings }, 200)
-                  }
-                  else {
-
-                    return spendings.push({
-                      category: category,
-                      transactionsCount: data.total_transactions,
-                      percentage: (parseFloat(data.amount) / parseFloat(total[0].amount)) * 100,
-                      amount: data.amount
-                    })
-                  }
+                if (err) {
+                  return console.log("Error while matching category", err);
                 }
 
-                else{
-                  let err,body,newCategory
+                else {
 
-                  body = {
-                    displayName:data.category,
-                    name:data.category,
-                    color:"",
-                    image:""
-                  }
+                  if (category !== null && category !== {}) {
 
-                  [err, newCategory] = await to(TransactionCategories.create(body))
+                    if (count === spendings.length) {
+                      spendings.push({
+                        category: category,
+                        transactionsCount: data.total_transactions,
+                        percentage: (parseFloat(data.amount) / parseFloat(total[0].amount)) * 100,
+                        amount: data.amount
+                      })
 
-                  if (err) {
-                    throw Error({ err })
+                      return ReS(res, { message: "Spending reports are...", success: true, spendings: spendings }, 200)
+                    }
+                    else {
+
+                      return spendings.push({
+                        category: category,
+                        transactionsCount: data.total_transactions,
+                        percentage: (parseFloat(data.amount) / parseFloat(total[0].amount)) * 100,
+                        amount: data.amount
+                      })
+                    }
                   }
 
                   else {
-                    return spendings.push({
-                      category: newCategory,
-                      transactionsCount: data.total_transactions,
-                      percentage: (parseFloat(data.amount) / parseFloat(total[0].amount)) * 100,
-                      amount: data.amount})
+                    let err, body, newCategory
+
+                    body = {
+                      displayName: data.category,
+                      name: data.category,
+                      color: "",
+                      image: ""
+                    }
+
+                    [err, newCategory] = await to(TransactionCategories.create(body))
+
+                    if (err) {
+                      throw Error({ err })
+                    }
+
+                    else {
+                      return spendings.push({
+                        category: newCategory,
+                        transactionsCount: data.total_transactions,
+                        percentage: (parseFloat(data.amount) / parseFloat(total[0].amount)) * 100,
+                        amount: data.amount
+                      })
+                    }
                   }
                 }
-              }
-            })
+              })
 
-          }
+            }
 
-          else{
-            return ReE(res,{message:"Transactions not found for this user.Please connect your bank and try again.",success:false},400)
-          }
+            else {
+              return ReE(res, { message: "Transactions not found for this user.Please connect your bank and try again.", success: false }, 400)
+            }
 
-        })
-      } catch (error) {
-        console.log(`Error while processing ${error}`);
+          })
+        } catch (error) {
+          console.log(`Error while processing ${error}`);
+        }
+      }
+
+      else{
+        return ReE(res, { message: "Transactions not found for this user.Please connect your bank and try again.", success: false }, 400)
       }
     }).catch(err => {
       response.status(500).send(err.stack)
