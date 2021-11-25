@@ -641,7 +641,9 @@ router.get('/payment',PlaidController.getPayment) // Get payments list
 
 router.get('/expenses', PlaidController.getExpenses) // Get expenses
 
-router.get('/myExpenses/:address', PlaidController.mockTransactions) // Mock api for expenses
+router.get('/myExpenses/:address', PlaidController.mySpendings) // Mock api for expenses
+
+router.get('/transactions/category/:category', PlaidController.getTransactionsByCategory) // Get transactions of a particular category
 
 router.post('/category', PlaidController.addCategory) // Create category api
 

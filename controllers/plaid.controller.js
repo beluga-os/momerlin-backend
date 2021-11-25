@@ -800,7 +800,31 @@ const deActivateCategory = async function (req,res) {
 
 module.exports.deActivateCategory = deActivateCategory
 
-const mockTransactions = async function (req, res) {
+const getTransactionsByCategory = async function (req,res) {
+  
+  let category,query,address
+
+  category = req.params.category
+  address = req.query.address
+
+  query = `SELECT * FROM transactions 
+  where address = ${Influx.escape.stringLit(address)} and category = ${Influx.escape.stringLit(category)}`
+
+  try {
+    await influxClient.query(query).then(async (result) => {
+      
+      return ReS(res,{message:`Transactions of ${category} category is..`,success:true,transactions:result},200)
+      
+    })
+  } catch (error) {
+    return ReE(res,{error},400)
+  }
+  
+}
+
+module.exports.getTransactionsByCategory = getTransactionsByCategory
+
+const mySpendings = async function (req, res) {
 
   let address,total,categories,spendings = [],categoryWiseQuery = `SELECT sum("sats") AS "amount",count("merchant_name") as "total_transactions" FROM "transactions" GROUP BY category`,totalQuery
 
@@ -877,7 +901,7 @@ const mockTransactions = async function (req, res) {
 
 }
 
-module.exports.mockTransactions = mockTransactions
+module.exports.mySpendings = mySpendings
 
 const prettyPrintResponse = (response) => {
   console.log(util.inspect(response.data, { colors: true, depth: 4 }));
