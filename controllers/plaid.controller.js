@@ -347,6 +347,7 @@ const getTransactions = async function (request, response, next) {
       }
     }
 
+
   }
 
   catch (error) {
@@ -836,7 +837,7 @@ const mySpendings = async function (req, res) {
 
   totalQuery =  `SELECT sum("sats") AS "amount" FROM transactions where address = ${Influx.escape.stringLit(address)}`
   
-  categoryWiseQuery = (startDate !== null && endDate !== null) ? `SELECT sum("sats") AS "amount",count("merchant_name") as "total_transactions" FROM "transactions" WHERE address = ${Influx.escape.stringLit(address)} and time >= ${startDate} and time <= ${endDate} GROUP BY category` : `SELECT sum("sats") AS "amount",count("merchant_name") as "total_transactions" FROM "transactions" GROUP BY category`
+  categoryWiseQuery = (startDate !== null && endDate !== null) ? `SELECT sum("sats") AS "amount",count("merchant_name") as "total_transactions" FROM "transactions" WHERE address = ${Influx.escape.stringLit(address)} and time >= ${startDate} and time <= ${endDate} GROUP BY category` : `SELECT sum("sats") AS "amount",count("merchant_name") as "total_transactions" FROM "transactions" WHERE address = ${Influx.escape.stringLit(address)} GROUP BY category`
 
   console.log("Checking address..",address);
   try {
@@ -893,8 +894,8 @@ const mySpendings = async function (req, res) {
                     body = {
                       displayName: data.category,
                       name: data.category,
-                      color: "",
-                      image: ""
+                      color: "#FF9BB3",
+                      image: "https://momerlin.s3.amazonaws.com/dev/images/category/sports.png"
                     }
 
                     [err, newCategory] = await to(TransactionCategories.create(body))
