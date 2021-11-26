@@ -803,18 +803,30 @@ module.exports.deActivateCategory = deActivateCategory
 
 const getTransactionsByCategory = async function (req,res) {
   
-  let category,query,address
+  let categoryName,query,address
 
-  category = req.params.category
+  categoryName = req.params.category
   address = req.query.address
 
   query = `SELECT * FROM transactions 
-  where address = ${Influx.escape.stringLit(address)} and category = ${Influx.escape.stringLit(category)}`
+  where address = ${Influx.escape.stringLit(address)} and category = ${Influx.escape.stringLit(categoryName)}`
 
   try {
     await influxClient.query(query).then(async (result) => {
-      
-      return ReS(res,{message:`Transactions of ${category} category is..`,success:true,transactions:result},200)
+      let err,category
+
+      [err,category] = await to (TransactionCategories.findOne({name:categoryName}))
+      if(err){
+        return ReE(res,{err},400)
+      }
+
+      if(result.length > 0){
+
+        await result.map((transaction,index)=>{
+          result[index].category = category
+        })
+      }
+      return ReS(res,{message:`Transactions of ${categoryName} category is..`,success:true,transactions:result},200)
       
     })
   } catch (error) {
@@ -895,7 +907,7 @@ const mySpendings = async function (req, res) {
                       displayName: data.category,
                       name: data.category,
                       color: "#FF9BB3",
-                      image: "https://momerlin.s3.amazonaws.com/dev/images/category/sports.png"
+                      image: data.category[0]
                     }
 
                     [err, newCategory] = await to(TransactionCategories.create(body))
