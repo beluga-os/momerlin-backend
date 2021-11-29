@@ -285,7 +285,7 @@ const getTransactions = async function (request, response, next) {
           },
           timestamp: time * 1000,
         }) :
-          (recent.length > 0 && time > parseInt(recent[0].createdAt)) &&
+          (recent.length > 0 && (time * 1000) > parseInt(recent[0].createdAt)) &&
           rows.push({
             measurement: 'transactions',
             tags: {
@@ -851,7 +851,8 @@ const mySpendings = async function (req, res) {
   
   categoryWiseQuery = (startDate !== null && endDate !== null) ? `SELECT sum("sats") AS "amount",count("merchant_name") as "total_transactions" FROM "transactions" WHERE address = ${Influx.escape.stringLit(address)} and time >= ${startDate} and time <= ${endDate} GROUP BY category` : `SELECT sum("sats") AS "amount",count("merchant_name") as "total_transactions" FROM "transactions" WHERE address = ${Influx.escape.stringLit(address)} GROUP BY category`
 
-  console.log("Checking address..",address);
+  console.log("Checking address..",address,startDate,endDate,req.query);
+
   try {
     await influxClient.query(totalQuery).then(async (result) => {
       total = result
