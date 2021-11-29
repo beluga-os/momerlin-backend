@@ -285,7 +285,7 @@ const getTransactions = async function (request, response, next) {
           },
           timestamp: time * 1000,
         }) :
-          (recent.length > 0 && (time * 1000) > parseInt(recent[0].createdAt)) &&
+          (recent.length > 0 && time > parseInt(recent[0].createdAt)) &&
           rows.push({
             measurement: 'transactions',
             tags: {
