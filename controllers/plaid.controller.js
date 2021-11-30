@@ -847,7 +847,7 @@ const mySpendings = async function (req, res) {
   
   endDate = (req.query.endDate !== undefined && req.query.endDate !== null) ? moment(req.query.endDate).valueOf() * 1000 : null;
 
-  totalQuery =  `SELECT sum("sats") AS "amount",count("merchant_name") as "total_transactions" FROM transactions where address = ${Influx.escape.stringLit(address)}`
+  totalQuery =  (startDate !== null && endDate !== null) ? `SELECT sum("sats") AS "amount",count("merchant_name") as "total_transactions" FROM transactions where address = ${Influx.escape.stringLit(address)} and time >= ${startDate} and time <= ${endDate} GROUP BY category` : `SELECT sum("sats") AS "amount",count("merchant_name") as "total_transactions" FROM transactions where address = ${Influx.escape.stringLit(address)}`
   
   categoryWiseQuery = (startDate !== null && endDate !== null) ? `SELECT sum("sats") AS "amount",count("merchant_name") as "total_transactions" FROM "transactions" WHERE address = ${Influx.escape.stringLit(address)} and time >= ${startDate} and time <= ${endDate} GROUP BY category` : `SELECT sum("sats") AS "amount",count("merchant_name") as "total_transactions" FROM "transactions" WHERE address = ${Influx.escape.stringLit(address)} GROUP BY category`
 
