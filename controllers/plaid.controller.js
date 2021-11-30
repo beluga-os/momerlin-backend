@@ -847,7 +847,7 @@ const mySpendings = async function (req, res) {
   
   endDate = (req.query.endDate !== undefined && req.query.endDate !== null) ? moment(req.query.endDate).valueOf() * 1000 : null;
 
-  totalQuery =  `SELECT sum("sats") AS "amount" FROM transactions where address = ${Influx.escape.stringLit(address)}`
+  totalQuery =  `SELECT sum("sats") AS "amount",count("merchant_name") as "total_transactions" FROM transactions where address = ${Influx.escape.stringLit(address)}`
   
   categoryWiseQuery = (startDate !== null && endDate !== null) ? `SELECT sum("sats") AS "amount",count("merchant_name") as "total_transactions" FROM "transactions" WHERE address = ${Influx.escape.stringLit(address)} and time >= ${startDate} and time <= ${endDate} GROUP BY category` : `SELECT sum("sats") AS "amount",count("merchant_name") as "total_transactions" FROM "transactions" WHERE address = ${Influx.escape.stringLit(address)} GROUP BY category`
 
@@ -856,7 +856,7 @@ const mySpendings = async function (req, res) {
   try {
     await influxClient.query(totalQuery).then(async (result) => {
       total = result
-
+      total_transactions = total[0].total_transactions
       if(result.length > 0){
 
         try {
@@ -884,7 +884,7 @@ const mySpendings = async function (req, res) {
                       spendings.push({
                         category: category,
                         transactionsCount: data.total_transactions,
-                        percentage: (parseFloat(data.amount) / parseFloat(total[0].amount)) * 100,
+                        percentage: (parseFloat(data.total_transactions) / parseFloat(total_transactions)) * 100,
                         amount: data.amount
                       })
 
@@ -892,10 +892,10 @@ const mySpendings = async function (req, res) {
                     }
                     else {
 
-                      return spendings.push({
+                      spendings.push({
                         category: category,
                         transactionsCount: data.total_transactions,
-                        percentage: (parseFloat(data.amount) / parseFloat(total[0].amount)) * 100,
+                        percentage: (parseFloat(data.total_transactions) / parseFloat(total_transactions)) * 100,
                         amount: data.amount
                       })
                     }
