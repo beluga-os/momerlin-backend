@@ -720,36 +720,43 @@ const getMyActivity = async function (req,res) {
         let result = [],challenges = []
 
         activities.map(data=>{
-            if(result.length < 1){
-                challenges.push(data.challenge._id)
-                return result.push({
-                    title: `${data.challenge.totalKm} km ${data.challenge.mode} ${data.challenge.type.toLowerCase()}`,
-                    date:moment(data.endAt).toISOString(),
-                    image: data.status === 'completed' ? asset.gold.image : asset.down.image,
-                    color: data.status === 'completed' ? asset.gold.color : asset.down.color,
-                    amount: data.status === 'completed' ? data.challenge.prize : data.challenge.wage
-                })
-            }
 
-            else{
-                if (!challenges.includes(data.challenge._id)) {
+            if(data.challenge !== null){
+                if (result.length < 1) {
                     challenges.push(data.challenge._id)
+                    return result.push({
+                        title: `${data.challenge.totalKm} km ${data.challenge.mode} ${data.challenge.type.toLowerCase()}`,
+                        date: moment(data.endAt).toISOString(),
+                        image: data.status === 'completed' ? asset.gold.image : asset.down.image,
+                        color: data.status === 'completed' ? asset.gold.color : asset.down.color,
+                        amount: data.status === 'completed' ? data.challenge.prize : data.challenge.wage
+                    })
+                }
 
-                    if (moment().utc().diff(data.endAt, 'days') > 0) {
-                        return result.push({
-                            title: `${data.challenge.totalKm} km ${data.challenge.mode} ${data.challenge.type.toLowerCase()}`,
-                            date: moment(data.endAt).toISOString(),
-                            image: data.status === 'completed' ? asset.gold.image : asset.down.image,
-                            color: data.status === 'completed' ? asset.gold.color : asset.down.color,
-                            amount: data.status === 'completed' ? data.prize : data.challenge.wage
-                        })
+                else {
+
+                    if (!challenges.includes(data.challenge._id)) {
+                        challenges.push(data.challenge._id)
+
+                        if (moment().utc().diff(data.endAt, 'days') > 0) {
+                            return result.push({
+                                title: `${data.challenge.totalKm} km ${data.challenge.mode} ${data.challenge.type.toLowerCase()}`,
+                                date: moment(data.endAt).toISOString(),
+                                image: data.status === 'completed' ? asset.gold.image : asset.down.image,
+                                color: data.status === 'completed' ? asset.gold.color : asset.down.color,
+                                amount: data.status === 'completed' ? data.prize : data.challenge.wage
+                            })
+                        }
+
+                        return
                     }
 
                     return
                 }
 
-                return
             }
+            
+                return
         })
     return ReS(res,{message:"Activity result",success:true,activities:result},200)
     }
