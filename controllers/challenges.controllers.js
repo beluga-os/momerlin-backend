@@ -408,7 +408,7 @@ const joinedChallenges = async function (req, res) {
                             sort: {
                                 createdAt: -1,
                             },
-                            populate: ([{ path: "competitor", select: '_id fullName' },
+                            populate: ([{ path: "competitor", select: '_id fullName imageUrl' },
                                 'challenge'])
                         }
                     
@@ -769,7 +769,7 @@ async function calculateWinner (id) {
     if (id) {
         let competitors, err
         [err, competitors] = await to(ChallengeTracker.find({ challenge: ObjectId(req.params.id), status: 'completed' })
-            .populate([{ path: "competitor", select: '_id fullName' },
+            .populate([{ path: "competitor", select: '_id fullName imageUrl' },
                 'challenge']))
         if (err) {
             throw Error({ err })

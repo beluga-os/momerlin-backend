@@ -160,7 +160,7 @@ const getByChallenges = async function (req, res) {
         sort: {
             streakNo: -1,
         },
-        populate: ([{ path: "competitor", select: '_id fullName' },
+        populate: ([{ path: "competitor", select: '_id fullName imageUrl' },
             'challenge'])
     }
 
@@ -203,7 +203,7 @@ const getByChallenger = async function (req, res) {
         sort: {
             createdAt: -1,
         },
-        populate: ([{ path: "competitor", select: '_id fullName' },
+        populate: ([{ path: "competitor", select: '_id fullName imageUrl' },
             'challenge'])
     }
 
@@ -244,7 +244,7 @@ const getChallenge = async function (req, res) {
         sort: {
             streakNo: -1,
         },
-        populate: ([{ path: "competitor", select: '_id fullName' },
+        populate: ([{ path: "competitor", select: '_id fullName imageUrl' },
             'challenge'])
     }
 
@@ -298,7 +298,7 @@ const getLeaders = async function (req, res) {
     let err, leaders
 
     [err, leaders] = await to(ChallengeTracker.find({}).limit(5).sort({ streakNo: -1,totalkm:-1 })
-        .populate([{ path: "competitor", select: '_id fullName' },
+        .populate([{ path: "competitor", select: '_id fullName imageUrl' },
             'challenge']))
 
     if (err) {
@@ -317,7 +317,7 @@ const getAllWinners = async function (req, res) {
     let err, leaders
 
     [err, leaders] = await to(ChallengeTracker.find({ status: 'completed' }).limit(10).sort({ prize:-1,streakNo: -1,totalkm:-1 })
-        .populate([{ path: "competitor", select: '_id fullName' },
+        .populate([{ path: "competitor", select: '_id fullName imageUrl' },
             'challenge']))
 
     if (err) {
@@ -334,7 +334,7 @@ const getChallengeWinner = async function (req, res) {
     let winners, err
 
     [err, winners] = await to(ChallengeTracker.find({ challenge: ObjectId(req.params.id), status: 'completed' }).limit(5)
-        .populate([{ path: "competitor", select: '_id fullName' },
+        .populate([{ path: "competitor", select: '_id fullName imageUrl' },
             'challenge']))
 
     if (err) {
@@ -358,7 +358,7 @@ const calculateWinner = async function (req, res) {
     if (id) {
         let competitors, err
         [err, competitors] = await to(ChallengeTracker.find({ challenge: ObjectId(req.params.id), status: 'completed' })
-            .populate([{ path: "competitor", select: '_id fullName' },
+            .populate([{ path: "competitor", select: '_id fullName imageUrl' },
                 'challenge']))
         if (err) {
             return ReE(res, { err }, 400)
