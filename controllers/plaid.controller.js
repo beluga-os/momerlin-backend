@@ -856,13 +856,13 @@ const mySpendings = async function (req, res) {
   try {
     await influxClient.query(totalQuery).then(async (result) => {
       total = result
-      total_transactions = total[0].total_transactions
-      if(result.length > 0){
+      
+      if (result.length > 0) {
+        total_transactions = total[0].total_transactions
 
         try {
           await influxClient.query(categoryWiseQuery).then(async result => {
             categories = result
-
             let count = categories.length - 1;
             if (categories && categories.length > 0) {
               await categories.map(async (data) => {
@@ -932,7 +932,7 @@ const mySpendings = async function (req, res) {
             }
 
             else {
-              return ReE(res, { message: "Transactions not found for this user.Please connect your bank and try again.", success: false }, 400)
+              return ReE(res, { message: "Transactions not found for this category.Please connect your bank and try again.", success: false }, 400)
             }
 
           })
@@ -941,15 +941,16 @@ const mySpendings = async function (req, res) {
         }
       }
 
-      else{
+      else {
         return ReE(res, { message: "Transactions not found for this user.Please connect your bank and try again.", success: false }, 400)
       }
     }).catch(err => {
-      response.status(500).send(err.stack)
+      console.log("Checking issue...",err);
+      return ReE(res, { err }, 400)
     })
 
   } catch (err) {
-    console.log(`Error while processing ${err}`);
+    return ReE(res, { err }, 400)
   }
 
 }
