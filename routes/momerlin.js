@@ -1,22 +1,20 @@
 const express = require('express');
 const router = express.Router();
 
-const PlaidController = require('../controllers/plaid.controller')
-const ChallengesController = require('../controllers/challenges.controllers')
-const ChallengeTrackerController = require('../controllers/challengeTracker.controllers')
+const PlaidController = require('../controllers/plaid.controller');
+const ChallengesController = require('../controllers/challenges.controllers');
+const ChallengeTrackerController = require('../controllers/challengeTracker.controllers');
 
 // const isAuth = require('../middleware/isAuth');
 router.get('/', (req, res) => {
-    return res.json({message:"Nothing here in this route"});
+  return res.json({ message: 'Nothing here in this route' });
 });
-
 
 // const passport = require('passport');
 
 // const jwtAuth = require('../middleware/passport').passport
 
 // const authUser = jwtAuth(passport).authenticate("jwt", { session: false });
-
 
 /**
  * @swagger
@@ -61,7 +59,7 @@ router.get('/', (req, res) => {
  *         name: Tata
  *         amount: 520.60
  *         sats: 40
- *     
+ *
  *     Token:
  *       type: object
  *       required:
@@ -72,7 +70,7 @@ router.get('/', (req, res) => {
  *           description: Public token
  *       example:
  *         public_token: publictoken
- *     
+ *
  *     Users:
  *       type: object
  *       required:
@@ -102,7 +100,7 @@ router.get('/', (req, res) => {
  *         ethAddress: ETH address
  *         tronAddress: TRON address
  *         seedEncrypted: Encrypted seed
- * 
+ *
  *     Challenges:
  *       type: object
  *       properties:
@@ -153,7 +151,7 @@ router.get('/', (req, res) => {
  *         startAt: 29/10/2021
  *         endAt: 06/11/2021
  *         active: true
- * 
+ *
  *     ChallengeTracker:
  *       type: object
  *       properties:
@@ -184,14 +182,14 @@ router.get('/', (req, res) => {
  *         endAt: 06/11/2021
  */
 
- /**
-  * @swagger
-  * tags:
-  *   name: Transactions
-  *   description: Transactions details managment api's
-  */
+/**
+ * @swagger
+ * tags:
+ *   name: Transactions
+ *   description: Transactions details managment api's
+ */
 
- /**
+/**
  * @swagger
  * /info:
  *   post:
@@ -275,15 +273,14 @@ router.get('/', (req, res) => {
  *                 $ref: '#/components/schemas/Transactions'
  */
 
- 
- /**
-  * @swagger
-  * tags:
-  *   name: Users
-  *   description: Users details managment api's
-  */
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: Users details managment api's
+ */
 
-  /**
+/**
  * @swagger
  * /user:
  *   post:
@@ -375,13 +372,13 @@ router.get('/', (req, res) => {
  */
 
 /**
-  * @swagger
-  * tags:
-  *   name: Challenges
-  *   description: Challenges details managment api's
-  */
+ * @swagger
+ * tags:
+ *   name: Challenges
+ *   description: Challenges details managment api's
+ */
 
-  /**
+/**
  * @swagger
  * /challenge/create:
  *   post:
@@ -512,7 +509,7 @@ router.get('/', (req, res) => {
  *   description: Api's to track challenge performance
  */
 
-  /**
+/**
  * @swagger
  * /track/challenge:
  *   post:
@@ -606,96 +603,103 @@ router.get('/', (req, res) => {
  *                 $ref: '#/components/schemas/ChallengeTracker'
  */
 
-  
 // ******* Plaid API's ******** //
 
-router.post('/info', PlaidController.getApiInfo) // get Api info
+router.post('/info', PlaidController.getApiInfo); // get Api info
 
-router.post('/create_link_token',PlaidController.createLinkToken) // create client link token
+router.post('/create_link_token', PlaidController.createLinkToken); // create client link token
 
-router.post('/create_link_token_for_payment',PlaidController.createPaymentLinkToken) // create a link token to make payment
+router.post(
+  '/create_link_token_for_payment',
+  PlaidController.createPaymentLinkToken,
+); // create a link token to make payment
 
-router.post('/set_access_token',PlaidController.setAccessToken) // Set Access token
- 
-router.get('/auth',PlaidController.getAuth) // Get auth information
+router.post('/set_access_token', PlaidController.setAccessToken); // Set Access token
 
-router.get('/transactions',PlaidController.getTransactions) // Get Transactions from plaid
+router.get('/auth', PlaidController.getAuth); // Get auth information
 
-router.get('/momerlin/transactions',PlaidController.getMomerlinTransactions) // Get transations from influxdb
+router.get('/transactions', PlaidController.getTransactions); // Get Transactions from plaid
 
-router.get('/investment_transactions',PlaidController.getInvestmentTransactions) // Get investments transactions
+router.get('/momerlin/transactions', PlaidController.getMomerlinTransactions); // Get transations from influxdb
 
-router.get('/identity',PlaidController.getIdentity) // Get Identity of a user
+router.get(
+  '/investment_transactions',
+  PlaidController.getInvestmentTransactions,
+); // Get investments transactions
 
-router.get('/balance',PlaidController.getBalance) // Get account balance
+router.get('/identity', PlaidController.getIdentity); // Get Identity of a user
 
-router.get('/holdings',PlaidController.getHoldings)  // Get Account holdings
+router.get('/balance', PlaidController.getBalance); // Get account balance
 
-router.get('/item',PlaidController.getItem) // Get an item
+router.get('/holdings', PlaidController.getHoldings); // Get Account holdings
 
-router.get('/assets',PlaidController.getItemAssets) // Get assets
+router.get('/item', PlaidController.getItem); // Get an item
 
-router.get('/accounts',PlaidController.getItemAccount) // Get accounts
+router.get('/assets', PlaidController.getItemAssets); // Get assets
 
-router.get('/payment',PlaidController.getPayment) // Get payments list
+router.get('/accounts', PlaidController.getItemAccount); // Get accounts
 
-router.get('/expenses', PlaidController.getExpenses) // Get expenses
+router.get('/payment', PlaidController.getPayment); // Get payments list
 
-router.get('/myExpenses/:address', PlaidController.mySpendings) // Mock api for expenses
+router.get('/expenses', PlaidController.getExpenses); // Get expenses
 
-router.get('/transactions/category/:category', PlaidController.getTransactionsByCategory) // Get transactions of a particular category
+router.get('/myExpenses/:address', PlaidController.mySpendings); // Mock api for expenses
 
-router.post('/category', PlaidController.addCategory) // Create category api
+router.get(
+  '/transactions/category/:category',
+  PlaidController.getTransactionsByCategory,
+); // Get transactions of a particular category
 
-router.delete('/category/deActivate/:id', PlaidController.deActivateCategory) // De-Activate category api
+router.post('/category', PlaidController.addCategory); // Create category api
+
+router.delete('/category/deActivate/:id', PlaidController.deActivateCategory); // De-Activate category api
 
 // ******* Users Api's ************ //
 
-router.post('/user',PlaidController.createUser) // Create user
+router.post('/user', PlaidController.createUser); // Create user
 
-router.get('/users',PlaidController.getUsers) // Get users
+router.get('/users', PlaidController.getUsers); // Get users
 
-router.get('/user/get',PlaidController.getUser) // Get a particular user
+router.get('/user/get', PlaidController.getUser); // Get a particular user
 
-router.get('/user/checkName/:name', PlaidController.checkUserName) // Api to check available user Name
+router.get('/user/checkName/:name', PlaidController.checkUserName); // Api to check available user Name
 
-router.put('/user/:id',PlaidController.updateUser) // Api to update a user
+router.put('/user/:id', PlaidController.updateUser); // Api to update a user
 
-router.delete('/user/delete',PlaidController.deleteUser) // Api to delete a user
+router.delete('/user/delete', PlaidController.deleteUser); // Api to delete a user
 
 // ******* Challenges API's ******** //
 
-router.post('/challenge/create',ChallengesController.createChallenge) // Create challenge
+router.post('/challenge/create', ChallengesController.createChallenge); // Create challenge
 
-router.get('/challenges',ChallengesController.getChallenges) // Api to Get all challenges 
+router.get('/challenges', ChallengesController.getChallenges); // Api to Get all challenges
 
-router.get('/user/challenges',ChallengesController.myChallenges) // Api to Get my challenges 
+router.get('/user/challenges', ChallengesController.myChallenges); // Api to Get my challenges
 
-router.get('/challenge/:id',ChallengesController.getChallengeInfo) // Api to get a particular challenge
+router.get('/challenge/:id', ChallengesController.getChallengeInfo); // Api to get a particular challenge
 
-router.put('/challenge/update',ChallengesController.updateChallenge) // Api to update a challenge
+router.put('/challenge/update', ChallengesController.updateChallenge); // Api to update a challenge
 
-router.put('/challenge/join',ChallengesController.joinChallenge) // Api to join a challenge
+router.put('/challenge/join', ChallengesController.joinChallenge); // Api to join a challenge
 
-router.delete('/challenge/delete',ChallengesController.deleteChallenge) // Api to delete a challenge
+router.delete('/challenge/delete', ChallengesController.deleteChallenge); // Api to delete a challenge
 
-router.put('/challenge/joined/:id',ChallengesController.joinedChallenges) // Api to get joined challenges
-
+router.put('/challenge/joined/:id', ChallengesController.joinedChallenges); // Api to get joined challenges
 
 // ********** Challenge tracker API's ************ //
 
-router.get('/track/challenger',ChallengeTrackerController.getByChallenger) // Api to get reocrd of a challenger
+router.get('/track/challenger', ChallengeTrackerController.getByChallenger); // Api to get reocrd of a challenger
 
-router.get('/track/challenge/get',ChallengeTrackerController.getByChallenges) // Api to get rocord of a challenge
+router.get('/track/challenge/get', ChallengeTrackerController.getByChallenges); // Api to get rocord of a challenge
 
-router.get('/track/:id', ChallengeTrackerController.getTracking)  // Api to get a reocrd of traking id
+router.get('/track/:id', ChallengeTrackerController.getTracking); // Api to get a reocrd of traking id
 
-router.get('/track/challenge/:id', ChallengeTrackerController.getChallenge) // Api to get a users record on a particular challenge
+router.get('/track/challenge/:id', ChallengeTrackerController.getChallenge); // Api to get a users record on a particular challenge
 
-router.get('/leaderboard', ChallengeTrackerController.getLeaders) // Api to get leade board details
+router.get('/leaderboard', ChallengeTrackerController.getLeaders); // Api to get leade board details
 
-router.get('/challenges/winners',ChallengeTrackerController.getAllWinners) // Api to get recent winners
+router.get('/challenges/winners', ChallengeTrackerController.getAllWinners); // Api to get recent winners
 
-router.get('/myActivity/:id',ChallengesController.getMyActivity) // Api to get my activity
+router.get('/myActivity/:id', ChallengesController.getMyActivity); // Api to get my activity
 
 module.exports = router;
